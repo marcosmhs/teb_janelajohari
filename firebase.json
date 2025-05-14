@@ -1,0 +1,27 @@
+{
+    "flutter":{
+        "platforms":{
+            "dart":{
+                "lib/firebase_options.dart":{
+                    "projectId":"teb-janelajohari",
+                    "configurations":{
+                        "web":"1:248849799755:web:9f7b307a5c243b160c8bce"
+                    }
+                }
+            }
+        }
+    },
+    "hosting":{
+        "public":"build/web",
+        "ignore":[
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**"
+        ],
+        "rewrites":[{
+            "source":"**",
+            "destination":"/index.html"
+        }]
+    }
+
+}

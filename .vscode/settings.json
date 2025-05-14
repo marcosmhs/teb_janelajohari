@@ -1,0 +1,7 @@
+{
+    "github.copilot.enable": {
+        "quarto": false,
+        "*": false,
+        "dart": false
+    }
+}
