@@ -42,6 +42,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     bool isPositive = true,
     required Color color,
   }) {
+    if (adjectives.isNotEmpty) {
+      adjectives.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -102,6 +106,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     TebCustomReturn retorno;
 
     retorno = await sessionVotesController.save(sessionFeedbacks: _sessionFeedbacks, sessionId: _session.id);
+
     if (retorno != TebCustomReturn.sucess) {
       TebCustomMessage.error(context, message: retorno.message);
     }

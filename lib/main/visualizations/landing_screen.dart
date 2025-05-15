@@ -86,10 +86,11 @@ class _LandingScreenState extends State<LandingScreen> {
             } else {
               // irá avaliar se o usuário possui login ou não
               if (sessionController.currentSession.id.isEmpty) {
-                return const ErrorScreen(errorMessage: 'Sessão não encontrada!');
+                return const ErrorScreen(errorMessage: 'Sessão não encontrada.');
               } else {
                 return LayoutBuilder(
                   builder: (context, constraints) {
+
                     return FeedbackScreen(
                       session: sessionController.currentSession,
                       feedbackType: FeedbackType.others,

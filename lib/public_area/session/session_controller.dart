@@ -47,6 +47,7 @@ class SessionController with ChangeNotifier {
       await FirebaseFirestore.instance.collection(Session.colletcionName).doc(session.id).set(session.toMap);
 
       _currentSession = session;
+      LocalDataController().saveSession(session: session);
 
       return TebCustomReturn.sucess;
     } catch (e) {
@@ -89,9 +90,6 @@ class SessionController with ChangeNotifier {
       if (dataList.length > 1) return TebCustomReturn.error('Foi encontrada mais de uma sessão com este código');
 
       _currentSession = Session.fromMap(dataList.first);
-
-      var localDataController = LocalDataController();
-      localDataController.saveSession(session: _currentSession);
 
       return TebCustomReturn.sucess;
     } catch (e) {

@@ -107,6 +107,8 @@ class _TitleBarWidgetState extends State<TitleBarWidget> {
           children: [
             Padding(padding: const EdgeInsets.only(bottom: 10), child: SiteTitleWidget(mobile: widget.mobile)),
             if (widget.feedbackType == FeedbackType.self)
+              Row(children: [TebText(widget.session.name, textSize: 20, padding: EdgeInsets.only(bottom: 20, left: 10))]),
+            if (widget.feedbackType == FeedbackType.self)
               Row(children: [Padding(padding: const EdgeInsets.only(bottom: 10), child: _sessionCode(context))]),
             if (widget.feedbackType == FeedbackType.self) _feedbackLink(context),
           ],
@@ -115,6 +117,10 @@ class _TitleBarWidgetState extends State<TitleBarWidget> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(padding: const EdgeInsets.only(bottom: 10), child: SiteTitleWidget(mobile: widget.mobile)),
+            if (widget.feedbackType == FeedbackType.self)
+              Row(children: [TebText(widget.session.name, textSize: 20, padding: EdgeInsets.only(bottom: 20, left: 10))]),
+
+            //U6UKY4UU
             if (widget.feedbackType == FeedbackType.self)
               Row(
                 children: [const SizedBox(width: 10), _sessionCode(context), const SizedBox(width: 30), _feedbackLink(context)],

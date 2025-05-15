@@ -2,24 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:teb_janelajohari/main/widgets/area_title_widget.dart';
 import 'package:teb_janelajohari/main/widgets/social_links_area.dart';
 import 'package:teb_package/util/teb_url_manager.dart';
+import 'package:teb_package/util/teb_util.dart';
 import 'package:teb_package/visual_elements/teb_text.dart';
 
-class ContactArea extends StatelessWidget {
+class ContactArea extends StatefulWidget {
   final bool mobile;
   const ContactArea({super.key, this.mobile = false});
 
   @override
+  State<ContactArea> createState() => _ContactAreaState();
+}
+
+class _ContactAreaState extends State<ContactArea> {
+  var _info = TebUtil.packageInfo;
+  var _initializing = true;
+  @override
   Widget build(BuildContext context) {
+    if (_initializing) {
+      TebUtil.version.then((info) => setState(() => _info = info));
+      _initializing = false;
+    }
+
     final Size size = MediaQuery.of(context).size;
     return Column(
       children: [
         SizedBox(
-          height: mobile ? null : size.height * 0.3,
-          width: mobile ? null : size.width - 100,
+          height: widget.mobile ? null : size.height * 0.3,
+          width: widget.mobile ? null : size.width - 100,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              AreaTitleWidget(size: size, title: 'Vamos conversar', mobile: mobile),
+              AreaTitleWidget(size: size, title: 'Vamos conversar', mobile: widget.mobile),
               Wrap(
                 children: [
                   Text(
@@ -37,7 +50,7 @@ class ContactArea extends StatelessWidget {
                   child: Container(
                     margin: const EdgeInsets.all(0.85),
                     height: 40,
-                    width: size.width * (mobile ? 0.45 : 0.15),
+                    width: size.width * (widget.mobile ? 0.45 : 0.15),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(6.0), color: Theme.of(context).primaryColor),
                     child: TebText(
@@ -54,20 +67,32 @@ class ContactArea extends StatelessWidget {
           ),
         ),
 
-        if (mobile)
+        if (widget.mobile)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
             child: SocialLinksArea(context: context, size: size, mobile: true),
           ),
-
         //Footer
-        TebText(
-          "Desenvolvido por Marcos H. Silva\n${DateTime.now().year}",
-          textSize: 15.0,
-          letterSpacing: 3.0,
-          textWeight: FontWeight.w200,
-          textAlign: TextAlign.center,
-          padding: EdgeInsets.only(bottom: 20),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            TebText(
+              "Desenvolvido por Marcos H. Silva\n${DateTime.now().year}",
+              textSize: 15.0,
+              letterSpacing: 3.0,
+              textWeight: FontWeight.w200,
+              textAlign: TextAlign.center,
+              padding: EdgeInsets.only(bottom: 10),
+            ),
+            TebText(
+              "v${_info.version}.${_info.buildNumber}",
+              textSize: 10.0,
+              letterSpacing: 3.0,
+              textWeight: FontWeight.w200,
+              textAlign: TextAlign.center,
+              padding: EdgeInsets.only(bottom: 30),
+            ),
+          ],
         ),
       ],
     );

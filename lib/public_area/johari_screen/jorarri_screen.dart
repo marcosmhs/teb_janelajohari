@@ -273,7 +273,7 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
               ? AreaTitleWidget(size: size, title: title, mobile: mobile, cropped: true)
               : Row(
                 children: [
-                  AreaTitleWidget(size: size, title: title, mobile: mobile, cropped: true),
+                  AreaTitleWidget(size: size, title: title, mobile: mobile, cropped: true, lineWidth: 0),
                   const Spacer(),
                   TebButton(
                     label: 'Exibir/Recolher',

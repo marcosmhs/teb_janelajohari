@@ -22,7 +22,6 @@ class SessionFeedbackController with ChangeNotifier {
           .doc(sessionFeedbacks.id)
           .set(sessionFeedbacks.toMap);
 
-      notifyListeners();
       return TebCustomReturn.sucess;
     } catch (e) {
       return TebCustomReturn.error(e.toString());
