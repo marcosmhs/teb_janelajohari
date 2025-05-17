@@ -86,6 +86,26 @@ class SessionFeedbackController with ChangeNotifier {
       List<String> othersFeedbackComments =
           othersFeedbacks.where((e) => e.comments.isNotEmpty).map((feedback) => feedback.comments).toList();
 
+      othersFeedbackComments.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+
+      // Contar adjetivos positivos e construtivos dos othersFeedbacks
+      Map<String, int> otherPositiveAdjectivesCount = {};
+      Map<String, int> otherConstructiveAdjectivesCount = {};
+
+      for (var feedback in othersFeedbacks) {
+        for (var adj in feedback.positiveAdjectives) {
+          otherPositiveAdjectivesCount[adj] = (otherPositiveAdjectivesCount[adj] ?? 0) + 1;
+        }
+
+        for (var adj in feedback.constructiveAdjectives) {
+          otherConstructiveAdjectivesCount[adj] = (otherConstructiveAdjectivesCount[adj] ?? 0) + 1;
+        }
+      }
+
+      // Ordenar por quantidade decrescente
+      var sortedPositive = otherPositiveAdjectivesCount.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+      var sortedConstructive = otherConstructiveAdjectivesCount.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+
       // Open Area
       List<String> openPositiveAdjectives = selfPositiveAdjectives.where((adj) => otherPositiveAdjectives.contains(adj)).toList();
       List<String> openConstructiveAdjectives =
@@ -107,23 +127,41 @@ class SessionFeedbackController with ChangeNotifier {
 
       return {
         'selfFeedback': {
-          'positiveAdjectives': selfPositiveAdjectives.toList(),
-          'constructiveAdjectives': selfConstructiveAdjectives.toList(),
+          'positiveAdjectives': selfPositiveAdjectives.toList()..sort(),
+          'constructiveAdjectives': selfConstructiveAdjectives.toList()..sort(),
         },
         'othersFeedback': {
           'count': othersFeedbacks.length,
-          'positiveAdjectives': otherPositiveAdjectives.toList(),
-          'constructiveAdjectives': otherConstructiveAdjectives.toList(),
-          'comments': othersFeedbackComments.toList(),
+          'positiveAdjectives': otherPositiveAdjectives.toList()..sort(),
+          'positiveAdjectivesWithCount': sortedPositive.map((e) => '${e.key} (${e.value})').toList(),
+          'constructiveAdjectives': otherConstructiveAdjectives.toList()..sort(),
+          'constructiveAdjectivesWithCount': sortedConstructive.map((e) => '${e.key} (${e.value})').toList(),
+          'comments': othersFeedbackComments.toList()..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase())),
         },
-        'openArea': {'positiveAdjectives': openPositiveAdjectives, 'constructiveAdjectives': openConstructiveAdjectives},
-        'blindArea': {'positiveAdjectives': blindPositiveAdjectives, 'constructiveAdjectives': blindConstructiveAdjectives},
-        'hiddenArea': {'positiveAdjectives': hiddenPositiveAdjectives, 'constructiveAdjectives': hiddenConstructiveAdjectives},
+        'openArea': {
+          'positiveAdjectives': openPositiveAdjectives..sort(),
+          'constructiveAdjectives': openConstructiveAdjectives..sort(),
+        },
+        'blindArea': {
+          'positiveAdjectives': blindPositiveAdjectives..sort(),
+          'constructiveAdjectives': blindConstructiveAdjectives..sort(),
+        },
+        'hiddenArea': {
+          'positiveAdjectives': hiddenPositiveAdjectives..sort(),
+          'constructiveAdjectives': hiddenConstructiveAdjectives..sort(),
+        },
       };
     } catch (e) {
       return {
         'selfFeedback': {'positiveAdjectives': [], 'constructiveAdjectives': []},
-        'othersFeedback': {'positiveAdjectives': [], 'constructiveAdjectives': [], 'comments': []},
+        'othersFeedback': {
+          'count': 0,
+          'positiveAdjectives': [],
+          'positiveAdjectivesWithCount': [],
+          'constructiveAdjectives': [],
+          'constructiveAdjectivesWithCount': [],
+          'comments': [],
+        },
         'openArea': {'positiveAdjectives': [], 'constructiveAdjectives': []},
         'blindArea': {'positiveAdjectives': [], 'constructiveAdjectives': []},
         'hiddenArea': {'positiveAdjectives': [], 'constructiveAdjectives': []},

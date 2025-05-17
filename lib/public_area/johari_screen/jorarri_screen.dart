@@ -33,6 +33,7 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
   var _session = Session();
   var _initializing = true;
   var _mobile = false;
+  var _showOthersFeedbackOrderedByAdjectiveName = true;
 
   final ExpansionTileController expansionTileControllerFeedbacks = ExpansionTileController();
   final ExpansionTileController expansionTileControllerJohariScreen = ExpansionTileController();
@@ -103,41 +104,63 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
     List<String>? othersComments,
     int? othersFeedbackCount,
     bool selfFeedbackArea = false,
+    bool othersFeedbackArea = false,
   }) {
-    if ((othersComments ?? []).isNotEmpty) {
-      othersComments!.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
-    }
+    var othersFeedbackOrderWidget = Row(
+      children: [
+        const TebText('Ordenar por: '),
+        TebButton(
+          onPressed: () => setState(() => _showOthersFeedbackOrderedByAdjectiveName = true),
+          buttonType: TebButtonType.outlinedButton,
+          child: TebText('Adjetivo', textWeight: _showOthersFeedbackOrderedByAdjectiveName ? FontWeight.bold : FontWeight.normal),
+        ),
+        const SizedBox(width: 10),
+        TebButton(
+          onPressed: () => setState(() => _showOthersFeedbackOrderedByAdjectiveName = false),
+          buttonType: TebButtonType.outlinedButton,
+          child: TebText(
+            'Quantidade de feedbacks',
+            textWeight: _showOthersFeedbackOrderedByAdjectiveName ? FontWeight.normal : FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+    var titleWidget = Row(
+      children: [
+        TebText(title, textSize: 30, textColor: Colors.black, padding: EdgeInsets.only(top: 10, bottom: 10, right: 10)),
+        if (selfFeedbackArea)
+          TebButton(
+            label: 'Alterar',
+            buttonType: TebButtonType.outlinedButton,
+            onPressed: () async {
+              var sessionFeedbacks = await SessionFeedbackController().getSessionSelfFeedbackBySessionId(sessionId: _session.id);
+              Navigator.of(context).pushNamed(
+                Routes.feedbackScreen,
+                arguments: {
+                  'session': _session,
+                  'sessionFeedbacks': sessionFeedbacks,
+                  'feedbackType': FeedbackType.self,
+                  'mobile': _mobile,
+                },
+              );
+            },
+          ),
+        // othersFeedbackOrderWidget display in the title row when
+        // is a brower screen
+        if (othersFeedbackArea && !_mobile) othersFeedbackOrderWidget,
+      ],
+    );
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              TebText(title, textSize: 30, textColor: Colors.black, padding: EdgeInsets.only(top: 10, bottom: 10, right: 10)),
-              if (selfFeedbackArea)
-                TebButton(
-                  label: 'Alterar',
-                  buttonType: TebButtonType.outlinedButton,
-                  onPressed: () async {
-                    var sessionFeedbacks = await SessionFeedbackController().getSessionSelfFeedbackBySessionId(
-                      sessionId: _session.id,
-                    );
-                    Navigator.of(context).pushNamed(
-                      Routes.feedbackScreen,
-                      arguments: {
-                        'session': _session,
-                        'sessionFeedbacks': sessionFeedbacks,
-                        'feedbackType': FeedbackType.self,
-                        'mobile': _mobile,
-                      },
-                    );
-                  },
-                ),
-              //if (icon != null) Icon(icon, size: 30),
-            ],
-          ),
+          titleWidget,
+          // othersFeedbackOrderWidget display in the main column when
+          // is a mobile screen
+          if (othersFeedbackArea && _mobile) othersFeedbackOrderWidget,
+          if (othersFeedbackArea && _mobile) const SizedBox(height: 10),
           Container(
             width: MediaQuery.of(context).size.width * 0.9,
             padding: const EdgeInsets.all(20.0),
@@ -167,14 +190,14 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
                   _adjectiveController(
                     title: 'Positivos',
                     subtitle: 'Atitudes e comportamentos percebidos como positivos',
-                    adjectives: (positiveAdjectives ?? [])..sort(),
+                    adjectives: (positiveAdjectives ?? []),
                     color: color,
                   ),
                 if ((constructiveAdjectives ?? []).isNotEmpty)
                   _adjectiveController(
                     title: 'Construtivos',
                     subtitle: 'Atitudes e comportamentos com oportunidades para desenvolvimento',
-                    adjectives: (constructiveAdjectives ?? [])..sort(),
+                    adjectives: (constructiveAdjectives ?? []),
                     isPositive: false,
                     color: color,
                   ),
@@ -403,10 +426,17 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
                         const SizedBox(height: 20),
                         _windowArea(
                           title: 'Feedback de seus colegas',
+                          othersFeedbackArea: true,
                           subtitle: 'Lista unificada de todos os adjetivos indicados por seus colegas',
                           color: SessionFeedbacks.othersFeedbackAreaColor,
-                          positiveAdjectives: feedbacks['othersFeedback']!['positiveAdjectives'],
-                          constructiveAdjectives: feedbacks['othersFeedback']!['constructiveAdjectives'],
+                          positiveAdjectives:
+                              _showOthersFeedbackOrderedByAdjectiveName
+                                  ? feedbacks['othersFeedback']!['positiveAdjectives']
+                                  : feedbacks['othersFeedback']!['positiveAdjectivesWithCount'],
+                          constructiveAdjectives:
+                              _showOthersFeedbackOrderedByAdjectiveName
+                                  ? feedbacks['othersFeedback']!['constructiveAdjectives']
+                                  : feedbacks['othersFeedback']!['constructiveAdjectivesWithCount'],
                           othersComments: feedbacks['othersFeedback']!['comments'],
                           othersFeedbackCount: feedbacks['othersFeedback']!['count'],
                           icon: FontAwesomeIcons.peopleGroup,
