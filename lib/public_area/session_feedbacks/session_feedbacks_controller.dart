@@ -28,7 +28,7 @@ class SessionFeedbackController with ChangeNotifier {
     }
   }
 
-  Future<List<SessionFeedbacks>> getSessionFeedbacks({required String sessionId, FeedbackType? feedbackType}) async {
+  Future<List<SessionFeedbacks>> getSessionFeedbacksBySessionId({required String sessionId, FeedbackType? feedbackType}) async {
     try {
       var feedbacks = <SessionFeedbacks>[];
       var collectionRef = FirebaseFirestore.instance
@@ -72,21 +72,29 @@ class SessionFeedbackController with ChangeNotifier {
     }
   }
 
-  Future<Map<String, Map<String, dynamic>>> getAllAreasFeedback({required String sessionId}) async {
+  Stream<QuerySnapshot<Object?>> getSessionFeedbacks({required String sessionId}) {
+    return FirebaseFirestore.instance
+        .collection(Session.colletcionName)
+        .doc(sessionId)
+        .collection(SessionFeedbacks.colletcionName)
+        .snapshots();
+  }
+
+  static Map<String, Map<String, dynamic>> getAllAreasFeedback({required List<SessionFeedbacks> feedbacks}) {
     try {
-      var selfFeedback = await getSessionFeedbacks(sessionId: sessionId, feedbackType: FeedbackType.self);
-      var othersFeedbacks = await getSessionFeedbacks(sessionId: sessionId, feedbackType: FeedbackType.others);
+      var selfFeedback = feedbacks.where((f) => f.feedbackType == FeedbackType.self);
+      var othersFeedbacks = feedbacks.where((f) => f.feedbackType == FeedbackType.others);
 
-      var selfPositiveAdjectives = selfFeedback.expand((feedback) => feedback.positiveAdjectives).toSet();
-      var selfConstructiveAdjectives = selfFeedback.expand((feedback) => feedback.constructiveAdjectives).toSet();
+      //var selfFeedback = await getSessionFeedbacks(sessionId: sessionId, feedbackType: FeedbackType.self);
+      //var othersFeedbacks = await getSessionFeedbacks(sessionId: sessionId, feedbackType: FeedbackType.others);
 
-      var otherPositiveAdjectives = othersFeedbacks.expand((feedback) => feedback.positiveAdjectives).toSet();
-      var otherConstructiveAdjectives = othersFeedbacks.expand((feedback) => feedback.constructiveAdjectives).toSet();
+      var selfPositiveAdjectives = selfFeedback.expand((f) => f.positiveAdjectives).toSet();
+      var selfConstructiveAdjectives = selfFeedback.expand((f) => f.constructiveAdjectives).toSet();
 
-      List<String> othersFeedbackComments =
-          othersFeedbacks.where((e) => e.comments.isNotEmpty).map((feedback) => feedback.comments).toList();
+      var otherPositiveAdjectives = othersFeedbacks.expand((f) => f.positiveAdjectives).toSet();
+      var otherConstructiveAdjectives = othersFeedbacks.expand((f) => f.constructiveAdjectives).toSet();
 
-      othersFeedbackComments.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+      List<String> othersFeedbackComments = othersFeedbacks.where((e) => e.comments.isNotEmpty).map((f) => f.comments).toList();
 
       // Contar adjetivos positivos e construtivos dos othersFeedbacks
       Map<String, int> otherPositiveAdjectivesCount = {};
@@ -107,21 +115,19 @@ class SessionFeedbackController with ChangeNotifier {
       var sortedConstructive = otherConstructiveAdjectivesCount.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
 
       // Open Area
-      List<String> openPositiveAdjectives = selfPositiveAdjectives.where((adj) => otherPositiveAdjectives.contains(adj)).toList();
+      List<String> openPositiveAdjectives = selfPositiveAdjectives.where((a) => otherPositiveAdjectives.contains(a)).toList();
       List<String> openConstructiveAdjectives =
-          selfConstructiveAdjectives.where((adj) => otherConstructiveAdjectives.contains(adj)).toList();
+          selfConstructiveAdjectives.where((a) => otherConstructiveAdjectives.contains(a)).toList();
 
       // Blind Area
-      List<String> blindPositiveAdjectives =
-          otherPositiveAdjectives.where((adj) => !selfPositiveAdjectives.contains(adj)).toList();
+      List<String> blindPositiveAdjectives = otherPositiveAdjectives.where((a) => !selfPositiveAdjectives.contains(a)).toList();
       List<String> blindConstructiveAdjectives =
-          otherConstructiveAdjectives.where((adj) => !selfConstructiveAdjectives.contains(adj)).toList();
+          otherConstructiveAdjectives.where((a) => !selfConstructiveAdjectives.contains(a)).toList();
 
       // Hidden Area
-      List<String> hiddenPositiveAdjectives =
-          selfPositiveAdjectives.where((adj) => !otherPositiveAdjectives.contains(adj)).toList();
+      List<String> hiddenPositiveAdjectives = selfPositiveAdjectives.where((a) => !otherPositiveAdjectives.contains(a)).toList();
       List<String> hiddenConstructiveAdjectives =
-          selfConstructiveAdjectives.where((adj) => !otherConstructiveAdjectives.contains(adj)).toList();
+          selfConstructiveAdjectives.where((a) => !otherConstructiveAdjectives.contains(a)).toList();
 
       // Sort all lists alphabetically
 
@@ -172,7 +178,7 @@ class SessionFeedbackController with ChangeNotifier {
   Future<Map<String, dynamic>> stats({required List<String> sessionIdList}) async {
     List<SessionFeedbacks> sessionFeedbacksList = [];
     for (var sessionid in sessionIdList) {
-      var sessionFeedbacks = await getSessionFeedbacks(sessionId: sessionid);
+      var sessionFeedbacks = await getSessionFeedbacksBySessionId(sessionId: sessionid);
       sessionFeedbacksList.addAll(sessionFeedbacks);
     }
 

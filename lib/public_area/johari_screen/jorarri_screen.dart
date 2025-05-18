@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -343,6 +344,200 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
 
     var size = MediaQuery.of(context).size;
 
+    return StreamBuilder<QuerySnapshot>(
+      stream: SessionFeedbackController().getSessionFeedbacks(sessionId: _session.id),
+      builder: (context, snapshot) {
+        List<SessionFeedbacks> sessionFeedbacks = [];
+
+        if ((snapshot.hasData) && (snapshot.data!.docs.isNotEmpty)) {
+          sessionFeedbacks.addAll(snapshot.data!.docs.map((e) => SessionFeedbacks.fromDocument(e)).toList());
+        }
+
+        var feedbacks = SessionFeedbackController.getAllAreasFeedback(feedbacks: sessionFeedbacks);
+
+        return TebCustomScaffold(
+          // appbar
+          responsive: false,
+          showAppBar: false,
+          fixedWidth: size.width * 0.9,
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: TitleBarWidget(
+                        session: _session,
+                        context: context,
+                        feedbackType: FeedbackType.self,
+                        mobile: _mobile,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 30),
+
+                // --------------------------------
+                // Feedbacks
+                // --------------------------------
+                _expandedTileArea(
+                  size: size,
+                  mobile: _mobile,
+                  title: 'Feedbacks',
+                  subTitle: 'Resumo de seu feedback pessoal e da percepção de seus colegas',
+                  controller: expansionTileControllerFeedbacks,
+                  children: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      _windowArea(
+                        title: 'Seu feedback',
+                        subtitle: 'Lista de adjetivos selecionados por você',
+                        color: SessionFeedbacks.selfFeedbackAreaColor,
+                        positiveAdjectives: feedbacks['selfFeedback']!['positiveAdjectives'],
+                        constructiveAdjectives: feedbacks['selfFeedback']!['constructiveAdjectives'],
+                        selfFeedbackArea: true,
+                        icon: FontAwesomeIcons.imagePortrait,
+                      ),
+                      const SizedBox(height: 20),
+                      _windowArea(
+                        title: 'Feedback de seus colegas',
+                        othersFeedbackArea: true,
+                        subtitle: 'Lista unificada de todos os adjetivos indicados por seus colegas',
+                        color: SessionFeedbacks.othersFeedbackAreaColor,
+                        positiveAdjectives:
+                            _showOthersFeedbackOrderedByAdjectiveName
+                                ? feedbacks['othersFeedback']!['positiveAdjectives']
+                                : feedbacks['othersFeedback']!['positiveAdjectivesWithCount'],
+                        constructiveAdjectives:
+                            _showOthersFeedbackOrderedByAdjectiveName
+                                ? feedbacks['othersFeedback']!['constructiveAdjectives']
+                                : feedbacks['othersFeedback']!['constructiveAdjectivesWithCount'],
+                        othersComments: feedbacks['othersFeedback']!['comments'],
+                        othersFeedbackCount: feedbacks['othersFeedback']!['count'],
+                        icon: FontAwesomeIcons.peopleGroup,
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                // --------------------------------
+                // Johari Screen
+                // --------------------------------
+                _expandedTileArea(
+                  size: size,
+                  mobile: _mobile,
+                  title: 'Sua Janela de Johari',
+                  subTitle: 'Abaixo estão as áreas de sua janela',
+                  controller: expansionTileControllerJohariScreen,
+                  children: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      _windowArea(
+                        title: 'Área Aberta',
+                        subtitle:
+                            'A área aberta, também conhecida como "Eu Aberto", representa <b>tudo o que você conhece sobre si mesmo(a) e '
+                            'que é também conhecido pelos outros</b>. É a zona de transparência e confiança, onde características e comportamentos '
+                            'são compartilhados livremente e há uma compreensão mútua entre você e todos a sua volta.',
+                        color: SessionFeedbacks.openAreaColor,
+                        positiveAdjectives: feedbacks['openArea']!['positiveAdjectives'],
+                        constructiveAdjectives: feedbacks['openArea']!['constructiveAdjectives'],
+                        icon: FontAwesomeIcons.eye,
+                      ),
+                      const SizedBox(height: 20),
+                      _windowArea(
+                        title: 'Área Cega',
+                        subtitle:
+                            'Esta área apresenta todos os <b>comportamentos e características percebidos pelos pelos outros, mas não por você</b>. Nesta área '
+                            'estão as oportunidades para rever comportamentos ou atitudes que podem impactar negativamente as pessoas a sua volta.',
+                        color: SessionFeedbacks.blindAreaColor,
+                        positiveAdjectives: feedbacks['blindArea']!['positiveAdjectives'],
+                        constructiveAdjectives: feedbacks['blindArea']!['constructiveAdjectives'],
+                        icon: FontAwesomeIcons.eyeSlash,
+                      ),
+                      const SizedBox(height: 20),
+                      _windowArea(
+                        title: 'Área Oculta',
+                        subtitle:
+                            'Nesta área estão as características, comportamentos, pensamentos e sentimentos <b>conhecida por nós, mas não pelos outros.</b>',
+                        color: SessionFeedbacks.hiddenAreaColor,
+                        positiveAdjectives: feedbacks['hiddenArea']!['positiveAdjectives'],
+                        constructiveAdjectives: feedbacks['hiddenArea']!['constructiveAdjectives'],
+                        icon: FontAwesomeIcons.doorClosed,
+                      ),
+                      const SizedBox(height: 20),
+                      _windowArea(
+                        title: 'Área Desconhecida',
+                        subtitle:
+                            'Esta é uma área conceitual onde está tudo o que é desconhecida por nós e pelos outros. Representa o potencial que ainda não foi explorado ou descoberto. Por isso não é possível determinar quais características estão presentes nela à partir desta dinâmica.',
+                        color: SessionFeedbacks.unknorAreaColor,
+                        icon: FontAwesomeIcons.question,
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                // --------------------------------
+                // AI Prompt
+                // --------------------------------
+                _expandedTileArea(
+                  size: size,
+                  mobile: _mobile,
+                  title: 'Prompt para análise utilizando IA',
+                  subTitle:
+                      'Utilize o texto abaixo como uma proposta para enviar para uma IA de sua escolha para lhe ajudar como um plano '
+                      'de desenvolvimento para sua carreira. Este prompt pode ser alterado de acordo com suas necessidades.',
+                  controller: expansionTileControllerAiPrompt,
+                  children: Container(
+                    padding: const EdgeInsets.all(20.0),
+                    decoration: BoxDecoration(color: Colors.blueGrey.shade100, borderRadius: BorderRadius.circular(12.0)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(20.0),
+                          decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(12.0)),
+                          child: TebText(_getIAText(feedbacks), padding: EdgeInsets.only(bottom: 10)),
+                        ),
+                        TebButton(
+                          padding: EdgeInsets.only(top: 20),
+                          label: 'Copiar texto',
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(text: _getIAText(feedbacks)));
+                            TebCustomMessage.sucess(context, message: 'Texto copiado para sua área de transferência!');
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 50),
+                TebButton(
+                  label: 'Deixar esta sessão',
+                  textStyle: TextStyle(fontSize: 18),
+                  size: Size(280, 40),
+                  onPressed: _confirmExit,
+                  icon: Icon(FontAwesomeIcons.arrowRightToBracket, size: 30),
+                ),
+                const SizedBox(height: 40),
+                ContactArea(mobile: _mobile),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    /*
     return FutureBuilder(
       future: SessionFeedbackController().getAllAreasFeedback(sessionId: _session.id),
       builder: (context, snapshot) {
@@ -558,5 +753,6 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
         }
       },
     );
+*/
   }
 }

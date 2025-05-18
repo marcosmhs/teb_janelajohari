@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teb_janelajohari/main/widgets/area_title_widget.dart';
 import 'package:teb_janelajohari/main/widgets/social_links_area.dart';
-import 'package:teb_package/util/teb_url_manager.dart';
 import 'package:teb_package/util/teb_util.dart';
 import 'package:teb_package/visual_elements/teb_text.dart';
 
@@ -43,23 +42,20 @@ class _ContactAreaState extends State<ContactArea> {
                 ],
               ),
               const SizedBox(height: 32.0),
-              InkWell(
-                onTap: () => TebUrlManager.launchEmail(email: 'marcosmhs@live.com'),
-                child: Card(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
-                  child: Container(
-                    margin: const EdgeInsets.all(0.85),
-                    height: 40,
-                    width: size.width * (widget.mobile ? 0.45 : 0.15),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(6.0), color: Theme.of(context).primaryColor),
-                    child: TebText(
-                      "Enviar um e-mail",
-                      textAlign: TextAlign.center,
-                      textSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
-                      letterSpacing: 3,
-                      textColor: Theme.of(context).cardColor,
-                    ),
+              Card(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
+                child: Container(
+                  margin: const EdgeInsets.all(0.85),
+                  height: 60,
+                  width: 300,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(6.0), color: Theme.of(context).primaryColor),
+                  child: TebText(
+                    "Envie um e-mail para \n marcosmhs@live.com",
+                    textAlign: TextAlign.center,
+                    textSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
+                    letterSpacing: 3,
+                    textColor: Theme.of(context).cardColor,
                   ),
                 ),
               ),
