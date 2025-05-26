@@ -1,6 +1,7 @@
 //import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:teb_janelajohari/public_area/session/session.dart';
 import 'package:teb_janelajohari/local_data_controller.dart';
 import 'package:teb_package/util/teb_return.dart';
@@ -9,12 +10,15 @@ import 'package:flutter/foundation.dart';
 
 class SessionController with ChangeNotifier {
   late Session _currentSession;
+  late Map<String, dynamic> _givenFeedbackCodeList;
 
   SessionController() {
     _currentSession = Session();
+    _givenFeedbackCodeList = {};
   }
 
   Session get currentSession => Session.fromMap(_currentSession.toMap);
+  Map<String, dynamic> get givenFeedbackCodeList => _givenFeedbackCodeList;
 
   Future<Map<String, dynamic>> get stats async {
     try {
@@ -63,7 +67,9 @@ class SessionController with ChangeNotifier {
       final dataList = sessionQuery.docs.map((doc) => doc.data()).toList();
 
       if (dataList.isEmpty) return TebCustomReturn.error('Não foi encontrada uma sessão com este código');
-      if (dataList.length > 1) return TebCustomReturn.error('Foi encontrada mais de uma sessão com este código');
+      if (dataList.length > 1) {
+        return TebCustomReturn.error('Foi encontrada mais de uma sessão com este código, por isso não é possível continuar.');
+      }
 
       _currentSession = Session.fromMap(dataList.first);
 
@@ -90,6 +96,11 @@ class SessionController with ChangeNotifier {
       if (dataList.length > 1) return TebCustomReturn.error('Foi encontrada mais de uma sessão com este código');
 
       _currentSession = Session.fromMap(dataList.first);
+
+      var localDataController = LocalDataController();
+      await localDataController.chechLocalData();
+
+      _givenFeedbackCodeList = localDataController.othersSessionFeedbackIdList;
 
       return TebCustomReturn.sucess;
     } catch (e) {

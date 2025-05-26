@@ -13,7 +13,7 @@ class CarouselWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return CarouselSlider(
       options: CarouselOptions(
-        viewportFraction: mobile ? 1 : 0.4,
+        viewportFraction: mobile ? 1 : 0.6,
         height: 400,
         initialPage: 0,
         enableInfiniteScroll: false,
@@ -24,7 +24,7 @@ class CarouselWidget extends StatelessWidget {
             return Builder(
               builder: (BuildContext context) {
                 return Container(
-                  height: 300,
+                  height: 0,
                   margin: const EdgeInsets.symmetric(horizontal: 8.0),
                   padding: const EdgeInsets.all(20.0),
                   decoration: BoxDecoration(color: item['color'], borderRadius: BorderRadius.circular(12.0)),

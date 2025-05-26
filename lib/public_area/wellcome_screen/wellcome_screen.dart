@@ -10,7 +10,6 @@ import 'package:teb_janelajohari/main/widgets/site_title_widget.dart';
 import 'package:teb_janelajohari/main/widgets/social_links_area.dart';
 import 'package:teb_janelajohari/public_area/wellcome_screen/widgets/find_session_widget.dart';
 import 'package:teb_janelajohari/public_area/wellcome_screen/widgets/new_session_widget.dart';
-import 'package:teb_janelajohari/routes.dart';
 import 'package:teb_package/teb_package.dart';
 
 class WellcomeScreen extends StatefulWidget {
@@ -23,8 +22,6 @@ class WellcomeScreen extends StatefulWidget {
 class _WellcomeScreenState extends State<WellcomeScreen> {
   late AutoScrollController _autoScrollController;
   final _scrollDirection = Axis.vertical;
-  bool get _isAppBarExpanded => _autoScrollController.hasClients && _autoScrollController.offset > (160 - kToolbarHeight);
-  bool _isExpaned = true;
 
   @override
   void initState() {
@@ -32,13 +29,13 @@ class _WellcomeScreenState extends State<WellcomeScreen> {
       viewportBoundaryGetter: () => Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
       axis: _scrollDirection,
     )..addListener(() {
-      _isAppBarExpanded
-          ? _isExpaned != false
-              ? setState(() => _isExpaned = false)
-              : {}
-          : _isExpaned != true
-          ? setState(() => _isExpaned = true)
-          : {};
+      //_isAppBarExpanded
+      //    ? _isExpaned != false
+      //        ? setState(() => _isExpaned = false)
+      //        : {}
+      //    : _isExpaned != true
+      //    ? setState(() => _isExpaned = true)
+      //    : {};
     });
     super.initState();
   }
@@ -102,8 +99,6 @@ class _WellcomeScreenState extends State<WellcomeScreen> {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
-    var mobile = size.width <= 1000;
-
     return TebCustomScaffold(
       showAppBar: false,
       responsive: false,
@@ -130,27 +125,19 @@ class _WellcomeScreenState extends State<WellcomeScreen> {
                         slivers: <Widget>[
                           SliverList(
                             delegate: SliverChildListDelegate([
-                              _wrapScrollTag(index: 0, child: AboutArea(mobile: mobile)),
+                              _wrapScrollTag(index: 0, child: AboutArea(mobile: false)),
                               const SizedBox(height: 80),
 
-                              _wrapScrollTag(index: 1, child: HowItWorksArea(mobile: mobile)),
+                              _wrapScrollTag(index: 1, child: HowItWorksArea(mobile: false)),
                               const SizedBox(height: 80),
 
-                              _wrapScrollTag(index: 2, child: NewSessionWidget(size: size, mobile: mobile)),
+                              _wrapScrollTag(index: 2, child: NewSessionWidget(size: size, mobile: false)),
                               const SizedBox(height: 80),
 
-                              _wrapScrollTag(index: 3, child: FindSessionWidget(size: size, mobile: mobile)),
+                              _wrapScrollTag(index: 3, child: FindSessionWidget(size: size, mobile: false)),
 
                               const SizedBox(height: 80),
                               ContactArea(),
-                              Center(
-                                child: TebButton(
-                                  label: 'Área Restrita',
-                                  buttonType: TebButtonType.outlinedButton,
-                                  onPressed: () => Navigator.of(context).pushNamed(Routes.loginScreen),
-                                  padding: EdgeInsets.only(bottom: 10),
-                                ),
-                              ),
                             ]),
                           ),
                         ],

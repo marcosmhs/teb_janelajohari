@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:teb_package/util/teb_util.dart';
 
 enum SiteTextStatus { created, saved, delete, updated }
 
@@ -15,6 +15,10 @@ class SiteText {
   late double size;
   late Color color;
   late bool bold;
+  late double paddingLeft;
+  late double paddingRight;
+  late double paddingTop;
+  late double paddingBotton;
 
   SiteText({
     this.id = '',
@@ -25,6 +29,10 @@ class SiteText {
     this.size = 12,
     this.color = Colors.black,
     this.bold = false,
+    this.paddingLeft = 0.0,
+    this.paddingRight = 0.0,
+    this.paddingTop = 0.0,
+    this.paddingBotton = 0.0,
   });
 
   void setToRemove() {
@@ -54,18 +62,38 @@ class SiteText {
       size: map['size'] ?? 0,
       bold: map['bold'] ?? false,
       color: map['color'] == null ? Colors.black : Color(map['color']),
+      paddingLeft: map['paddingLeft'] ?? 0.0,
+      paddingRight: map['paddingRight'] ?? 0.0,
+      paddingTop: map['paddingTop'] ?? 0.0,
+      paddingBotton: map['paddingBotton'] ?? 0.0,
     );
     return u;
   }
 
   Map<String, dynamic> get toMap {
     Map<String, dynamic> r = {};
-    r = {'id': id, 'page': page, 'local': local, 'text': text, 'size': size, 'bold': bold, 'color': color.toARGB32()};
+    r = {
+      'id': id,
+      'page': page,
+      'local': local,
+      'text': text,
+      'size': size,
+      'bold': bold,
+      'color': color.toARGB32(),
+      'paddingLeft': paddingLeft,
+      'paddingRight': paddingRight,
+      'paddingTop': paddingTop,
+      'paddingBotton': paddingBotton,
+    };
 
     return r;
   }
 
+  void setText(String value) {
+    text = value;
+  }
+
   String get html {
-    return "${bold ? '<b>' : ''}<span style='color: #${color.toHexString()}; font-size: ${size}px'> $text </span>${bold ? '</b>' : ''}";
+    return "${bold ? '<b>' : ''}<span style='color: ${TebUtil.colorToHex(color)}; font-size: ${size}px'> $text </span>${bold ? '</b>' : ''}";
   }
 }

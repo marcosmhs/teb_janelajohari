@@ -90,10 +90,10 @@ class _LandingScreenState extends State<LandingScreen> {
               } else {
                 return LayoutBuilder(
                   builder: (context, constraints) {
-
                     return FeedbackScreen(
                       session: sessionController.currentSession,
                       feedbackType: FeedbackType.others,
+                      sessionFeedbackId: sessionController.givenFeedbackCodeList[sessionFeedbackCode],
                       mobile: constraints.maxWidth <= 1000,
                     );
                   },

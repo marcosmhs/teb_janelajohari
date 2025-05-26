@@ -38,7 +38,7 @@ class _SiteTextFormState extends State<SiteTextForm> {
   }
 
   void _setExperienceToRemove({required SiteText siteText}) {
-    TebCustomDialog(context: context).confirmationDialog(message: 'Excluir esta experiência?').then((value) {
+    TebCustomDialog(context: context).confirmationDialog(message: 'Excluir este texto?').then((value) {
       if (value == true) {
         if (siteText.id.isEmpty) {
           setState(() => _siteTextList.remove(siteText));
@@ -115,20 +115,27 @@ class _SiteTextFormState extends State<SiteTextForm> {
     final TextEditingController textController = TextEditingController(text: siteText.text);
     final TextEditingController sizeController = TextEditingController(text: siteText.size.toString());
 
+    final TextEditingController paddingLeftController = TextEditingController(text: siteText.paddingLeft.toString());
+    final TextEditingController paddingRightController = TextEditingController(text: siteText.paddingRight.toString());
+    final TextEditingController paddingTopController = TextEditingController(text: siteText.paddingTop.toString());
+    final TextEditingController paddingBottonController = TextEditingController(text: siteText.paddingBotton.toString());
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // text info
           SizedBox(
-            width: size.width * 0.55,
+            width: size.width * 0.75,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
                     TebTextEdit(
-                      width: size.width * 0.25,
+                      width: size.width * 0.35,
                       labelText: 'Página (código)',
                       controller: pageController,
                       keyboardType: TextInputType.text,
@@ -146,7 +153,7 @@ class _SiteTextFormState extends State<SiteTextForm> {
                     ),
                     const Spacer(),
                     TebTextEdit(
-                      width: size.width * 0.28,
+                      width: size.width * 0.35,
                       labelText: 'Local (código)',
                       controller: localController,
                       onSave: (value) {
@@ -209,6 +216,77 @@ class _SiteTextFormState extends State<SiteTextForm> {
                   ],
                 ),
                 const SizedBox(height: 20),
+                TebText('Padding', textSize: 20, padding: EdgeInsets.only(bottom: 10)),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    TebTextEdit(
+                      width: 160,
+                      labelText: 'Left',
+                      controller: paddingLeftController,
+                      padding: EdgeInsets.only(right: 10),
+                      onSave: (value) {
+                        setState(() {
+                          siteText.paddingLeft = double.tryParse((value ?? '')) ?? 0.0;
+                          siteText.setUpdated();
+                        });
+                      },
+                      onChanged: (value) {
+                        siteText.paddingLeft = double.tryParse((value ?? '')) ?? 0.0;
+                        siteText.setUpdated();
+                      },
+                    ),
+                    TebTextEdit(
+                      width: 160,
+                      labelText: 'Right',
+                      controller: paddingRightController,
+                      padding: EdgeInsets.only(right: 10),
+                      onSave: (value) {
+                        setState(() {
+                          siteText.paddingRight = double.tryParse((value ?? '')) ?? 0.0;
+                          siteText.setUpdated();
+                        });
+                      },
+                      onChanged: (value) {
+                        siteText.paddingRight = double.tryParse((value ?? '')) ?? 0.0;
+                        siteText.setUpdated();
+                      },
+                    ),
+                    TebTextEdit(
+                      width: 160,
+                      labelText: 'Top',
+                      controller: paddingTopController,
+                      padding: EdgeInsets.only(right: 10),
+                      onSave: (value) {
+                        setState(() {
+                          siteText.paddingTop = double.tryParse((value ?? '')) ?? 0.0;
+                          siteText.setUpdated();
+                        });
+                      },
+                      onChanged: (value) {
+                        siteText.paddingTop = double.tryParse((value ?? '')) ?? 0.0;
+                        siteText.setUpdated();
+                      },
+                    ),
+                    TebTextEdit(
+                      width: 160,
+                      labelText: 'Botton',
+                      controller: paddingBottonController,
+                      padding: EdgeInsets.only(right: 10),
+                      onSave: (value) {
+                        setState(() {
+                          siteText.paddingBotton = double.tryParse((value ?? '')) ?? 0.0;
+                          siteText.setUpdated();
+                        });
+                      },
+                      onChanged: (value) {
+                        siteText.paddingBotton = double.tryParse((value ?? '')) ?? 0.0;
+                        siteText.setUpdated();
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
                 Container(
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black, width: 1),
@@ -228,11 +306,19 @@ class _SiteTextFormState extends State<SiteTextForm> {
                                 buttonType: TebButtonType.outlinedButton,
                                 onPressed: () => setState(() {}),
                               ),
+                              if (siteText.color.toARGB32() == 4294967295)
+                                TebText(
+                                  'Cor de fundo preta para permitir visualização do texto branco',
+                                  padding: EdgeInsets.only(left: 10),
+                                ),
                             ],
                           ),
                         ],
                       ),
-                      Html(data: siteText.html),
+                      Html(
+                        data:
+                            '${siteText.color.toARGB32() == 4294967295 ? '<span style="background-color: black">' : ''} ${siteText.html} ${siteText.color.toARGB32() == 4294967295 ? '</span>' : ''}',
+                      ),
                     ],
                   ),
                 ),
@@ -244,7 +330,7 @@ class _SiteTextFormState extends State<SiteTextForm> {
           ),
           // remove option
           SizedBox(
-            width: size.width * 0.1,
+            //width: size.width * 0.1,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,9 +339,11 @@ class _SiteTextFormState extends State<SiteTextForm> {
                   label: 'Remover',
                   onPressed: () => _setExperienceToRemove(siteText: siteText),
                   enabled: siteText.status != SiteTextStatus.delete,
+                  padding: EdgeInsets.only(top: 20),
                 ),
-                if (siteText.status == SiteTextStatus.delete)
-                  const TebText('Marcado para ser Excluído', padding: EdgeInsets.all(8)),
+                if (siteText.status == SiteTextStatus.created) const TebText('Novo', padding: EdgeInsets.all(8)),
+                if (siteText.status == SiteTextStatus.updated) const TebText('Alterado', padding: EdgeInsets.all(8)),
+                if (siteText.status == SiteTextStatus.delete) const TebText('Marcado para exclusão', padding: EdgeInsets.all(8)),
               ],
             ),
           ),
@@ -278,12 +366,12 @@ class _SiteTextFormState extends State<SiteTextForm> {
       onChanged: (String? value) {
         if ((value ?? '').isNotEmpty) {
           if (_siteTextList.where((e) => e.status != SiteTextStatus.saved).isEmpty) {
-            _changePageFilterDropDownButtonValue(value: value ?? '');
+            _changePageFilterDropDownButtonValue(page: value ?? '');
           } else {
             TebCustomDialog(context: context)
                 .confirmationDialog(message: 'Mudar o filtro fará com que todas as alterações sejam perdidas, deseja continuar')
                 .then((anser) {
-                  if (anser ?? false) _changePageFilterDropDownButtonValue(value: value ?? '');
+                  if (anser ?? false) _changePageFilterDropDownButtonValue(page: value ?? '');
                 });
           }
         }
@@ -295,19 +383,19 @@ class _SiteTextFormState extends State<SiteTextForm> {
     );
   }
 
-  void _changePageFilterDropDownButtonValue({required String value}) {
-    if (value == 'Selecione uma página') {
+  void _changePageFilterDropDownButtonValue({required String page, String local = ''}) {
+    if (page == 'Selecione uma página') {
       setState(() {
-        _dropdownValue = value;
+        _dropdownValue = page;
         _siteTextList.clear();
       });
     } else {
       setState(() {
-        _dropdownValue = value;
-        SiteTextController.getSiteTextList(page: value).then((siteTextListLocal) {
+        _dropdownValue = page;
+        SiteTextController.getSiteTextList(page: page).then((siteTextListLocal) {
           setState(() {
             _siteTextList.clear();
-            _siteTextList.addAll(siteTextListLocal);
+            _siteTextList.addAll(siteTextListLocal.where((s) => local.isEmpty || s.local.contains(local)));
           });
         });
       });
@@ -347,12 +435,24 @@ class _SiteTextFormState extends State<SiteTextForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // button options
+            const SizedBox(height: 10),
+            // intro text title
             TebButtonsLine(
               mainAxisAlignment: MainAxisAlignment.end,
               padding: const EdgeInsets.symmetric(vertical: 10),
               buttons: [
+                _pageFilterDropDownButton(),
+                TebTextEdit(
+                  labelText: 'Local',
+                  width: 250,
+                  onChanged: (value) {
+                    if ((value ?? '').isNotEmpty) {
+                      _changePageFilterDropDownButtonValue(page: _siteTextList.first.page, local: value!);
+                    }
+                  },
+                ),
                 const Spacer(),
+                TebButton(label: 'Adicionar novo texto', onPressed: () => _addSiteTextList()),
                 TebButton(
                   label: 'Cancelar',
                   buttonType: TebButtonType.outlinedButton,
@@ -361,18 +461,9 @@ class _SiteTextFormState extends State<SiteTextForm> {
                 TebButton(label: 'Salvar', onPressed: () => _submit()),
               ],
             ),
-            const SizedBox(height: 10),
-            // intro text title
-            Row(
-              children: [
-                _pageFilterDropDownButton(),
-                const Spacer(),
-                TebButton(label: 'Adicionar novo texto', onPressed: () => _addSiteTextList()),
-              ],
-            ),
             SizedBox(
-              height: size.height * 0.8,
-              width: size.width * 0.78,
+              height: size.height * 0.85,
+              width: size.width * 0.88,
               child:
                   _siteTextList.isEmpty
                       ? TebText('Selecione uma página ou inicie um novo texto')
@@ -383,7 +474,6 @@ class _SiteTextFormState extends State<SiteTextForm> {
                         },
                       ),
             ),
-            const SizedBox(height: 10),
           ],
         ),
       ),

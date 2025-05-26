@@ -20,6 +20,8 @@ class WellcomeScreenMobile extends StatefulWidget {
 class _WellcomeScreenMobileState extends State<WellcomeScreenMobile> {
   @override
   Widget build(BuildContext context) {
+
+
     final Size size = MediaQuery.of(context).size;
 
     return TebCustomScaffold(

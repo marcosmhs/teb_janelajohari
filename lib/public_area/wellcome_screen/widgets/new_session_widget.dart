@@ -12,20 +12,21 @@ class NewSessionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var buttonWidget = TebButton(
-      label: 'Criar uma sessão individual',
-      size: mobile ? null : Size(260, 50),
+      label: 'Clique aqui para criar sua própria sessão',
+      size: Size(350, 50),
       textStyle: TextStyle(fontSize: 14),
       onPressed: () => Navigator.of(context).pushNamed(Routes.sessionForm, arguments: {'mobile': mobile}),
     );
     var textWidget = TebText(
-      'Utilize esta opção para criar uma sessão própria, onde você fará sua autoavaliação e'
-      'depois irá pedir a colegas de seu time um feedback com base nos mesmos atributos.',
-      textSize: Theme.of(context).textTheme.titleLarge!.fontSize,
+      'Utilize esta opção para criar uma sessão própria, onde <b>você fará sua autoavaliação</b> e depois irá pedir a colegas de seu contribuam com <b>feedbacks utilizando os mesmos atributos</b>.',
+      textType: TextType.html,
+      textSize: 20,
       textColor: Theme.of(context).canvasColor,
     );
+
     return Column(
       children: [
-        AreaTitleWidget(size: size, title: 'Criar uma sessão própria', mobile: mobile),
+        AreaTitleWidget(size: size, mobile: mobile, title: 'Criar uma sessão própria'),
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 8.0),
           padding: const EdgeInsets.all(20.0),

@@ -6,6 +6,7 @@ import 'package:teb_janelajohari/local_data_controller.dart';
 import 'package:teb_janelajohari/main/widgets/area_title_widget.dart';
 import 'package:teb_janelajohari/main/widgets/contact_area.dart';
 import 'package:teb_janelajohari/public_area/invalid_access_screen.dart';
+import 'package:teb_janelajohari/public_area/session/session_controller.dart';
 import 'package:teb_janelajohari/public_area/session_feedbacks/session_feedbacks_controller.dart';
 import 'package:teb_janelajohari/main/widgets/title_bar_widget.dart';
 import 'package:teb_janelajohari/public_area/session_feedbacks/session_feedbacks.dart';
@@ -23,7 +24,8 @@ class FeedbackScreen extends StatefulWidget {
   final Session? session;
   final FeedbackType? feedbackType;
   final bool? mobile;
-  const FeedbackScreen({super.key, this.session, this.feedbackType, this.mobile});
+  final String? sessionFeedbackId;
+  const FeedbackScreen({super.key, this.session, this.feedbackType, this.mobile, this.sessionFeedbackId});
 
   @override
   State<FeedbackScreen> createState() => _FeedbackScreenState();
@@ -34,14 +36,78 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   var _session = Session();
   var _sessionFeedbacks = SessionFeedbacks();
   var _mobile = false;
+
+  var _hasOthersFeedback = false;
+  var _savingCustomAdjective = false;
+
   final TextEditingController _commentsController = TextEditingController();
+
+  final _formKeyPositiveAdjectives = GlobalKey<FormState>();
+  final _formKeyConstrutiveAdjectives = GlobalKey<FormState>();
+  final TextEditingController _customPositiveAdjectiveController = TextEditingController();
+  final TextEditingController _customConstrutiveAdjectiveController = TextEditingController();
 
   Widget _adjectiveController({
     required String title,
+    required Session session,
     required List<String> adjectives,
     bool isPositive = true,
     required Color color,
+    required TextEditingController adjectiveController,
+    required GlobalKey<FormState> formKey,
   }) {
+    var newAdjectiveTebTextWidget = TebTextEdit(
+      labelText: isPositive ? 'Adicionar novo adjetivo positivo' : 'Adicionar novo adjetivo construtivo',
+      controller: adjectiveController,
+      fillColor: Theme.of(context).canvasColor,
+      textInputAction: TextInputAction.send,
+      enabled: true,
+      width: 300,
+    );
+
+    var newAdjectiveAddButtonWidget = TebButton(
+      label: 'Adicionar',
+      buttonType: TebButtonType.elevatedButton,
+      onPressed: () {
+        if (!(formKey.currentState?.validate() ?? true)) {
+          _savingCustomAdjective = false;
+        } else {
+          try {
+            if (adjectiveController.text == '') {
+              TebCustomMessage.error(context, message: 'Você não informou o adjetivo');
+              return;
+            }
+            if (_savingCustomAdjective) return;
+            _savingCustomAdjective = true;
+            formKey.currentState?.save();
+
+            if (isPositive) {
+              session.positiveAdjectives.add(adjectiveController.text);
+            } else {
+              session.constructiveAdjectives.add(adjectiveController.text);
+            }
+
+            SessionController().save(session: session).then((value) {
+              setState(() => adjectiveController.clear());
+            });
+          } finally {
+            _savingCustomAdjective = false;
+          }
+        }
+      },
+    );
+
+    var newAdjectivesWidget = Form(
+      key: formKey,
+      child:
+          _mobile
+              ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [newAdjectiveTebTextWidget, const SizedBox(height: 10), newAdjectiveAddButtonWidget],
+              )
+              : Row(children: [newAdjectiveTebTextWidget, const SizedBox(width: 10), newAdjectiveAddButtonWidget]),
+    );
+
     if (adjectives.isNotEmpty) {
       adjectives.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
     }
@@ -52,8 +118,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         TebText(
           title,
           textSize: Theme.of(context).textTheme.titleLarge!.fontSize,
-          textWeight: Theme.of(context).textTheme.titleLarge!.fontWeight,
-          textColor: Theme.of(context).colorScheme.primary,
+          textWeight: FontWeight.bold,
           padding: const EdgeInsets.only(top: 18),
         ),
         Padding(
@@ -87,6 +152,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 }).toList(),
           ),
         ),
+        if (_sessionFeedbacks.feedbackType == FeedbackType.self && !_hasOthersFeedback) newAdjectivesWidget,
       ],
     );
   }
@@ -105,7 +171,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     var sessionVotesController = SessionFeedbackController();
     TebCustomReturn retorno;
 
-    retorno = await sessionVotesController.save(sessionFeedbacks: _sessionFeedbacks, sessionId: _session.id);
+    retorno = await sessionVotesController.save(sessionFeedbacks: _sessionFeedbacks, session: _session);
 
     if (retorno != TebCustomReturn.sucess) {
       TebCustomMessage.error(context, message: retorno.message);
@@ -153,6 +219,27 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
       _sessionFeedbacks.feedbackType = arguments['feedbackType'] ?? widget.feedbackType ?? FeedbackType.self;
 
+      if (_sessionFeedbacks.feedbackType == FeedbackType.self) {
+        SessionFeedbackController()
+            .getSessionFeedbacksBySessionId(sessionId: _session.id, feedbackType: FeedbackType.others)
+            .then((value) {
+              if (value.isNotEmpty) {
+                setState(() => _hasOthersFeedback = true);
+              }
+            });
+      }
+
+      if ((widget.sessionFeedbackId ?? '') != '') {
+        SessionFeedbackController()
+            .getSessionFeedbackBySessionFeedbackId(sessionId: _session.id, sessionFeedbackId: widget.sessionFeedbackId!)
+            .then((value) {
+              setState(() {
+                _sessionFeedbacks = value;
+                _commentsController.text = _sessionFeedbacks.comments;
+              });
+            });
+      }
+
       _initializing = false;
     }
 
@@ -169,40 +256,37 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             TitleBarWidget(session: _session, context: context, feedbackType: _sessionFeedbacks.feedbackType, mobile: _mobile),
             const SizedBox(height: 20),
             AreaTitleWidget(
               size: size,
-              title: _sessionFeedbacks.feedbackType == FeedbackType.self ? 'Reflexão individual' : 'Coleta de Feedback ',
               mobile: _mobile,
+              title: _sessionFeedbacks.feedbackType == FeedbackType.self ? 'Reflexão individual' : 'Coleta de Feedback',
             ),
 
-            Padding(
+            TebText(
+              _sessionFeedbacks.feedbackType == FeedbackType.self
+                  ? 'Selecione de 5 a 10 adjetivos da lista abaixo que acredita melhor descrevem <b>VOCÊ</b> no contexto do trabalho em equipe no contexto do trabalho em equipe'
+                  : 'Selecione de 5 a 10 adjetivos da lista abaixo que acredita melhor descrevem <b>${_session.name}</b> no contexto do trabalho em equipe no contexto do trabalho em equipe',
+              textType: TextType.html,
+              textSize: 24,
               padding: const EdgeInsets.only(bottom: 10),
-              child: RichText(
-                //textAlign: TextAlign.center,
-                text: TextSpan(
-                  text:
-                      _sessionFeedbacks.feedbackType == FeedbackType.self
-                          ? 'Selecione de 5 a 10 adjetivos da lista abaixo que acredita melhor descrevem '
-                          : 'Selecione de 5 a 10 adjetivos da lista abaixo que acredite descrever bem ',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                  children: [
-                    TextSpan(
-                      text: _sessionFeedbacks.feedbackType == FeedbackType.self ? 'VOCÊ' : _session.name,
-                      style: TextStyle(fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.primary),
-                    ),
-                    TextSpan(
-                      text:
-                          _sessionFeedbacks.feedbackType == FeedbackType.self
-                              ? ' no contexto do trabalho em equipe'
-                              : ' no ambiente de trabalho',
-                    ),
-                  ],
-                ),
-              ),
             ),
+
+            if (_hasOthersFeedback)
+              TebText(
+                '* Você já recebeu ao menos um feedback de outras pessoas e por isso não é possível adicionar novos adjetivos',
+                textSize: 16,
+                padding: EdgeInsets.only(bottom: 10),
+              ),
+            if (!_hasOthersFeedback)
+              TebText(
+                '* Você também pode adicionar outros adjetivos para que seu time possa utilizá-los seu seus feedbacks',
+                textSize: 16,
+                padding: EdgeInsets.only(bottom: 10),
+              ),
 
             Container(
               padding: const EdgeInsets.all(20.0),
@@ -219,7 +303,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   SizedBox(
                     child: _adjectiveController(
                       title: 'Adjetivos positivos',
+                      session: _session,
                       adjectives: _session.positiveAdjectives,
+                      adjectiveController: _customPositiveAdjectiveController,
+                      formKey: _formKeyPositiveAdjectives,
                       color:
                           _sessionFeedbacks.feedbackType == FeedbackType.self
                               ? SessionFeedbacks.selfFeedbackAreaColor
@@ -229,7 +316,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   SizedBox(
                     child: _adjectiveController(
                       title: 'Adjetivos construtivos',
+                      session: _session,
                       adjectives: _session.constructiveAdjectives,
+                      adjectiveController: _customConstrutiveAdjectiveController,
+                      formKey: _formKeyConstrutiveAdjectives,
                       isPositive: false,
                       color:
                           _sessionFeedbacks.feedbackType == FeedbackType.self
@@ -251,7 +341,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               TebText(
                 'Caso queira deixar algum comentário para esta pessoa, use o espaço abaixo',
                 textSize: 18,
-                padding: EdgeInsets.only(top: 20),
+                padding: const EdgeInsets.only(top: 20),
               ),
 
             if (_sessionFeedbacks.feedbackType == FeedbackType.others)

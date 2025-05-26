@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:teb_janelajohari/admin_area/admin_area_invalid_access_screen.dart';
+import 'package:teb_janelajohari/admin_area/site_text/site_text_controller.dart';
 import 'package:teb_janelajohari/admin_area/user/user.dart';
 import 'package:teb_janelajohari/public_area/session/session_controller.dart';
 import 'package:teb_janelajohari/public_area/session_feedbacks/session_feedbacks_controller.dart';
@@ -19,6 +21,7 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
   var _initializing = true;
   var _user = User();
   var _info = TebUtil.packageInfo;
+  var _str = '';
 
   Map<String, dynamic> _sessionStats = {};
   Map<String, dynamic> _feedbackStats = {};
@@ -65,6 +68,10 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
       _initializing = false;
 
       TebUtil.version.then((info) => setState(() => _info = info));
+
+      SiteTextController.getSiteTextStringList.then((value) {
+        setState(() => _str = value);
+      });
 
       SessionController().stats.then((sessionStats) {
         setState(() => _sessionStats = sessionStats);
@@ -181,7 +188,6 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
 
                 if (_feedbackStats['constructiveAdjectivesCount'] != null)
                   ExpansionTile(
-                    
                     title: TebText(
                       'Adjetivos construtivos utilizados (${_feedbackStats['constructiveAdjectivesCount'].length})',
                       textSize: 16,
@@ -204,6 +210,16 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
                       ),
                     ],
                   ),
+
+                TebText(_str),
+                TebButton(
+                  padding: EdgeInsets.only(top: 20),
+                  label: 'Copiar texto',
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: _str));
+                    TebCustomMessage.sucess(context, message: 'Texto copiado para sua área de transferência!');
+                  },
+                ),
               ],
             ),
           ),

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:teb_janelajohari/local_data_controller.dart';
 import 'package:teb_janelajohari/public_area/session/session.dart';
 import 'package:teb_janelajohari/public_area/session_feedbacks/session_feedbacks.dart';
 import 'package:teb_package/util/teb_return.dart';
@@ -8,19 +9,26 @@ import 'package:teb_package/util/teb_uid_generator.dart';
 class SessionFeedbackController with ChangeNotifier {
   SessionFeedbackController();
 
-  Future<TebCustomReturn> save({required SessionFeedbacks sessionFeedbacks, required String sessionId}) async {
+  Future<TebCustomReturn> save({required SessionFeedbacks sessionFeedbacks, required Session session}) async {
     try {
       if (sessionFeedbacks.id.isEmpty) {
         sessionFeedbacks.id = TebUidGenerator.firestoreUid;
-        sessionFeedbacks.sessionId = sessionId;
+        sessionFeedbacks.sessionId = session.id;
       }
 
       await FirebaseFirestore.instance
           .collection(Session.colletcionName)
-          .doc(sessionId)
+          .doc(session.id)
           .collection(SessionFeedbacks.colletcionName)
           .doc(sessionFeedbacks.id)
           .set(sessionFeedbacks.toMap);
+
+      if (sessionFeedbacks.feedbackType == FeedbackType.others) {
+        LocalDataController().saveOthersSessionFeedback(
+          feedbackCode: session.feedbackCode,
+          sessionFeedbackId: sessionFeedbacks.id,
+        );
+      }
 
       return TebCustomReturn.sucess;
     } catch (e) {
@@ -49,6 +57,27 @@ class SessionFeedbackController with ChangeNotifier {
       return [...feedbacks];
     } catch (e) {
       return [];
+    }
+  }
+
+  Future<SessionFeedbacks> getSessionFeedbackBySessionFeedbackId({
+    required String sessionId,
+    required String sessionFeedbackId,
+  }) async {
+    try {
+      var querySnapshot =
+          await FirebaseFirestore.instance
+              .collection(Session.colletcionName)
+              .doc(sessionId)
+              .collection(SessionFeedbacks.colletcionName)
+              .doc(sessionFeedbackId)
+              .get();
+
+      if (querySnapshot.exists) return SessionFeedbacks.fromDocument(querySnapshot);
+
+      return SessionFeedbacks();
+    } catch (e) {
+      return SessionFeedbacks();
     }
   }
 
