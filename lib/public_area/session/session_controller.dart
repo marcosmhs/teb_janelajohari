@@ -2,8 +2,10 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:teb_janelajohari/consts.dart';
 import 'package:teb_janelajohari/public_area/session/session.dart';
 import 'package:teb_janelajohari/local_data_controller.dart';
+import 'package:teb_package/util/teb_aes_encrypt.dart';
 import 'package:teb_package/util/teb_return.dart';
 import 'package:teb_package/util/teb_uid_generator.dart';
 import 'package:flutter/foundation.dart';
@@ -46,6 +48,17 @@ class SessionController with ChangeNotifier {
       if (session.id.isEmpty) {
         session.id = TebUidGenerator.firestoreUid;
         session.createDate = DateTime.now();
+        session.encryptedAccessCode = TebAesEncrypt(
+          ivKey: Consts.textEncriptStaticKey,
+          fixedIvKey: Consts.textEncriptStaticKey,
+        ).encryp(text: session.encryptedAccessCode);
+
+        if (session.positiveAdjectives.isNotEmpty) {
+          session.positiveAdjectives = session.positiveAdjectives.toSet().toList();
+        }
+        if (session.constructiveAdjectives.isNotEmpty) {
+          session.constructiveAdjectives = session.constructiveAdjectives.toSet().toList();
+        }
       }
 
       await FirebaseFirestore.instance.collection(Session.colletcionName).doc(session.id).set(session.toMap);
@@ -59,12 +72,32 @@ class SessionController with ChangeNotifier {
     }
   }
 
+  //F6IB8F9Y
   Future<TebCustomReturn> getCurrentSessionByAccessCode({required String accessCode}) async {
     try {
       var sessionQuery =
-          await FirebaseFirestore.instance.collection(Session.colletcionName).where("accessCode", isEqualTo: accessCode).get();
+          await FirebaseFirestore.instance
+              .collection(Session.colletcionName)
+              .where(
+                "encryptedAccessCode",
+                isEqualTo: TebAesEncrypt(
+                  ivKey: Consts.textEncriptStaticKey,
+                  fixedIvKey: Consts.textEncriptStaticKey,
+                ).encryp(text: accessCode.trim()),
+              )
+              .get();
 
-      final dataList = sessionQuery.docs.map((doc) => doc.data()).toList();
+      var dataList = sessionQuery.docs.map((doc) => doc.data()).toList();
+
+      if (dataList.isEmpty) {
+        sessionQuery =
+            await FirebaseFirestore.instance
+                .collection(Session.colletcionName)
+                .where("accessCode", isEqualTo: accessCode.trim())
+                .get();
+
+        dataList = sessionQuery.docs.map((doc) => doc.data()).toList();
+      }
 
       if (dataList.isEmpty) return TebCustomReturn.error('Não foi encontrada uma sessão com este código');
       if (dataList.length > 1) {

@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-
+import 'package:teb_janelajohari/consts.dart';
+import 'package:teb_package/util/teb_aes_encrypt.dart';
 
 class Session {
-
   static const List<String> basePositiveAdjectives = [
     'Amigável',
     'Criativo',
@@ -36,7 +35,7 @@ class Session {
     'Resiliente',
     'Visionário',
   ];
-  
+
   static const List<String> baseConstructiveAdjectives = [
     'Propensão à Impaciência', // Indica uma tendência que precisa ser gerenciada.
     'Tendência à Teimosia / Inflexibilidade', // Deixa claro a dificuldade em ser flexível.
@@ -64,7 +63,7 @@ class Session {
 
   late String id;
   late String name;
-  late String accessCode;
+  late String encryptedAccessCode;
   late String feedbackCode;
   late DateTime? createDate;
   late List<String> positiveAdjectives = [];
@@ -73,7 +72,7 @@ class Session {
   Session({
     this.id = '',
     this.name = '',
-    this.accessCode = '',
+    this.encryptedAccessCode = '',
     this.feedbackCode = '',
     this.createDate,
     List<String>? positiveAdjectives,
@@ -89,13 +88,27 @@ class Session {
     return Session.fromMap(data);
   }
 
-  static Session fromMap(Map<String, dynamic> map) {
-    var u = Session();
+  String get accessCode {
+    var decryptRetutn = TebAesEncrypt(
+      ivKey: Consts.textEncriptStaticKey,
+      fixedIvKey: Consts.textEncriptStaticKey,
+    ).decrypt(encryptedText: encryptedAccessCode);
+    return decryptRetutn['decryptedText'].toString().toUpperCase();
+  }
 
-    u = Session(
+  static Session fromMap(Map<String, dynamic> map) {
+    var session = Session();
+
+    session = Session(
       id: map['id'] ?? '',
       name: map['name'] ?? '',
-      accessCode: map['accessCode'] ?? '',
+      encryptedAccessCode:
+          (map['encryptedAccessCode'] ?? '').isEmpty
+              ? TebAesEncrypt(
+                ivKey: Consts.textEncriptStaticKey,
+                fixedIvKey: Consts.textEncriptStaticKey,
+              ).encryp(text: map['accessCode'] ?? '')
+              : map['encryptedAccessCode'] ?? '',
       feedbackCode: map['feedbackCode'] ?? '',
       createDate: map['createDate'] == null ? null : DateTime.tryParse(map['createDate']),
       positiveAdjectives:
@@ -105,10 +118,16 @@ class Session {
               ? List<String>.from(map['constructiveAdjectives'].map((item) => item.toString()))
               : [],
     );
-    return u;
 
+    if (session.positiveAdjectives.isNotEmpty) {
+      session.positiveAdjectives = session.positiveAdjectives.toSet().toList();
+    }
+    if (session.constructiveAdjectives.isNotEmpty) {
+      session.constructiveAdjectives = session.constructiveAdjectives.toSet().toList();
+    }
+
+    return session;
   }
-
 
   String get sessionFeedbackUrl {
     //return 'http://localhost:1234?session_feedback_code=$feedbackCode';
@@ -120,7 +139,7 @@ class Session {
     r = {
       'id': id,
       'name': name,
-      'accessCode': accessCode,
+      'encryptedAccessCode': encryptedAccessCode,
       'feedbackCode': feedbackCode,
       'createDate': createDate?.toString(),
       'positiveAdjectives': positiveAdjectives,

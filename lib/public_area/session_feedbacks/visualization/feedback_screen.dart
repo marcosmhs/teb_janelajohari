@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:diacritic/diacritic.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:teb_janelajohari/local_data_controller.dart';
@@ -81,15 +82,22 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             _savingCustomAdjective = true;
             formKey.currentState?.save();
 
+            var adjetivesList = isPositive ? session.positiveAdjectives : session.constructiveAdjectives;
+
+            if (adjetivesList.where((e) {
+              return removeDiacritics(e.toUpperCase().trim()) == removeDiacritics(adjectiveController.text.toUpperCase().trim());
+            }).isNotEmpty) {
+              TebCustomMessage.error(context, message: 'Já existe um adjetivo com este nome');
+              return;
+            }
+
             if (isPositive) {
               session.positiveAdjectives.add(adjectiveController.text);
             } else {
               session.constructiveAdjectives.add(adjectiveController.text);
             }
 
-            SessionController().save(session: session).then((value) {
-              setState(() => adjectiveController.clear());
-            });
+            SessionController().save(session: session).then((value) => setState(() => adjectiveController.clear()));
           } finally {
             _savingCustomAdjective = false;
           }

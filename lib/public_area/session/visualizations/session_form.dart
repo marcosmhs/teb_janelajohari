@@ -36,9 +36,6 @@ class _SessionFormState extends State<SessionForm> {
   bool _newSession = false;
   bool _mobile = false;
 
-  //List<String> _localBasePositiveAdjectives = [];
-  //List<String> _localBaseConstructiveAdjectives = [];
-
   void _submit() async {
     if (!(_formKey.currentState?.validate() ?? true)) {
       _savingData = false;
@@ -148,17 +145,12 @@ class _SessionFormState extends State<SessionForm> {
       _session = arguments['session'] ?? Session();
       _mobile = arguments['mobile'] ?? false;
       _newSession = _session.id.isEmpty;
-      _session.accessCode = _newSession ? TebUidGenerator.invitationCode : _session.accessCode;
+      _session.encryptedAccessCode = _newSession ? TebUidGenerator.invitationCode : _session.encryptedAccessCode;
       _session.feedbackCode = _newSession ? TebUidGenerator.invitationCode : _session.feedbackCode;
       _initializing = false;
-      _accessCodeController.text = _session.accessCode;
+      _accessCodeController.text = _newSession ? _session.encryptedAccessCode : _session.accessCode;
       _feedbackUrlController.text = _session.sessionFeedbackUrl;
       _nameController.text = _session.name;
-
-      //_localBasePositiveAdjectives = List<String>.from(Session.basePositiveAdjectives);
-      //_localBasePositiveAdjectives.sort();
-      //_localBaseConstructiveAdjectives = List<String>.from(Session.baseConstructiveAdjectives);
-      //_localBaseConstructiveAdjectives.sort();
     }
 
     return TebCustomScaffold(

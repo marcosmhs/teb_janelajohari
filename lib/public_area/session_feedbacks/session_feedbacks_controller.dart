@@ -114,9 +114,6 @@ class SessionFeedbackController with ChangeNotifier {
       var selfFeedback = feedbacks.where((f) => f.feedbackType == FeedbackType.self);
       var othersFeedbacks = feedbacks.where((f) => f.feedbackType == FeedbackType.others);
 
-      //var selfFeedback = await getSessionFeedbacks(sessionId: sessionId, feedbackType: FeedbackType.self);
-      //var othersFeedbacks = await getSessionFeedbacks(sessionId: sessionId, feedbackType: FeedbackType.others);
-
       var selfPositiveAdjectives = selfFeedback.expand((f) => f.positiveAdjectives).toSet();
       var selfConstructiveAdjectives = selfFeedback.expand((f) => f.constructiveAdjectives).toSet();
 
