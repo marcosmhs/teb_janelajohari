@@ -4,9 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:teb_janelajohari/admin_area/site_text/site_text.dart';
+import 'package:teb_package/control_widgets/teb_text.dart';
 import 'package:teb_package/util/teb_return.dart';
 import 'package:teb_package/util/teb_uid_generator.dart';
-import 'package:teb_package/visual_elements/teb_text.dart';
 
 class SiteTextController with ChangeNotifier {
   SiteTextController();
@@ -155,7 +155,7 @@ class SiteTextController with ChangeNotifier {
     return str;
   }
 
-  Future<TebCustomReturn> save({required List<SiteText> siteTextList}) async {
+  Future<TebReturn> save({required List<SiteText> siteTextList}) async {
     try {
       for (var siteText in siteTextList) {
         if (siteText.status == SiteTextStatus.delete) {
@@ -167,9 +167,9 @@ class SiteTextController with ChangeNotifier {
         }
       }
 
-      return TebCustomReturn.sucess;
+      return TebReturn.sucess;
     } catch (e) {
-      return TebCustomReturn.error(e.toString());
+      return TebReturn.error(e.toString());
     }
   }
 }

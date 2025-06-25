@@ -8,7 +8,7 @@ class InvalidAccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TebCustomScaffold(
+    return TebScaffold(
       showAppBar: false,
       body: Center(
         child: SizedBox(

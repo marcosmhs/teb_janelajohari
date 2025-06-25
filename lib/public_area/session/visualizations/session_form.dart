@@ -9,13 +9,13 @@ import 'package:teb_janelajohari/public_area/session_feedbacks/session_feedbacks
 import 'package:teb_janelajohari/public_area/session/session.dart';
 import 'package:teb_janelajohari/public_area/session/session_controller.dart';
 import 'package:teb_janelajohari/routes.dart';
-import 'package:teb_package/messaging/teb_custom_message.dart';
-import 'package:teb_package/screen_elements/teb_custom_scaffold.dart';
+import 'package:teb_package/control_widgets/teb_buttons_line.dart';
+import 'package:teb_package/control_widgets/teb_text.dart';
+import 'package:teb_package/control_widgets/teb_text_edit.dart';
+import 'package:teb_package/messaging/teb_message.dart';
+import 'package:teb_package/screen_widgets/teb_scaffold.dart';
 import 'package:teb_package/util/teb_return.dart';
 import 'package:teb_package/util/teb_uid_generator.dart';
-import 'package:teb_package/visual_elements/teb_buttons_line.dart';
-import 'package:teb_package/visual_elements/teb_text.dart';
-import 'package:teb_package/visual_elements/teb_text_form_field.dart';
 
 class SessionForm extends StatefulWidget {
   const SessionForm({super.key});
@@ -81,10 +81,7 @@ class _SessionFormState extends State<SessionForm> {
                             onPressed: () {
                               Clipboard.setData(ClipboardData(text: _accessCodeController.text));
                               Navigator.of(ctx).pop(true);
-                              TebCustomMessage.sucess(
-                                context,
-                                message: 'Código de acesso copiado para sua área de transferência!',
-                              );
+                              TebMessage.sucess(context, message: 'Código de acesso copiado para sua área de transferência!');
                             },
                             size: Size(_mobile ? 350 : 450, 70),
                             child: TebText(
@@ -111,17 +108,17 @@ class _SessionFormState extends State<SessionForm> {
         // salva os dados
         _formKey.currentState?.save();
         var sessionController = SessionController();
-        TebCustomReturn retorno;
+        TebReturn retorno;
         try {
-          retorno = TebCustomReturn.sucess;
+          retorno = TebReturn.sucess;
           retorno = await sessionController.save(session: _session);
-          if (retorno.returnType != TebCustomReturn.sucess.returnType) {
-            TebCustomMessage.error(context, message: retorno.message);
+          if (retorno.returnType != TebReturn.sucess.returnType) {
+            TebMessage.error(context, message: retorno.message);
             _savingData = false;
             return;
           }
 
-          TebCustomMessage.sucess(context, message: _newSession ? 'Sessão criada!' : 'Sessão alterada');
+          TebMessage.sucess(context, message: _newSession ? 'Sessão criada!' : 'Sessão alterada');
 
           if (_newSession) {
             Navigator.of(context).popAndPushNamed(
@@ -153,7 +150,7 @@ class _SessionFormState extends State<SessionForm> {
       _nameController.text = _session.name;
     }
 
-    return TebCustomScaffold(
+    return TebScaffold(
       responsive: false,
       showAppBar: false,
       useCenter: false,
@@ -226,7 +223,7 @@ class _SessionFormState extends State<SessionForm> {
                         buttonType: TebButtonType.outlinedButton,
                         onPressed: () {
                           Clipboard.setData(ClipboardData(text: _accessCodeController.text));
-                          TebCustomMessage.sucess(context, message: 'Código copiado para sua área de transferência!');
+                          TebMessage.sucess(context, message: 'Código copiado para sua área de transferência!');
                         },
                       ),
 
@@ -252,7 +249,7 @@ class _SessionFormState extends State<SessionForm> {
                         buttonType: TebButtonType.outlinedButton,
                         onPressed: () {
                           Clipboard.setData(ClipboardData(text: _feedbackUrlController.text));
-                          TebCustomMessage.sucess(context, message: 'Link copiado para sua área de transferência!');
+                          TebMessage.sucess(context, message: 'Link copiado para sua área de transferência!');
                         },
                       ),
                       const SizedBox(height: 20),

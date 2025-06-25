@@ -43,7 +43,7 @@ class SessionController with ChangeNotifier {
     }
   }
 
-  Future<TebCustomReturn> save({required Session session}) async {
+  Future<TebReturn> save({required Session session}) async {
     try {
       if (session.id.isEmpty) {
         session.id = TebUidGenerator.firestoreUid;
@@ -66,14 +66,14 @@ class SessionController with ChangeNotifier {
       _currentSession = session;
       LocalDataController().saveSession(session: session);
 
-      return TebCustomReturn.sucess;
+      return TebReturn.sucess;
     } catch (e) {
-      return TebCustomReturn.error(e.toString());
+      return TebReturn.error(e.toString());
     }
   }
 
   //F6IB8F9Y
-  Future<TebCustomReturn> getCurrentSessionByAccessCode({required String accessCode}) async {
+  Future<TebReturn> getCurrentSessionByAccessCode({required String accessCode}) async {
     try {
       var sessionQuery =
           await FirebaseFirestore.instance
@@ -99,9 +99,9 @@ class SessionController with ChangeNotifier {
         dataList = sessionQuery.docs.map((doc) => doc.data()).toList();
       }
 
-      if (dataList.isEmpty) return TebCustomReturn.error('Não foi encontrada uma sessão com este código');
+      if (dataList.isEmpty) return TebReturn.error('Não foi encontrada uma sessão com este código');
       if (dataList.length > 1) {
-        return TebCustomReturn.error('Foi encontrada mais de uma sessão com este código, por isso não é possível continuar.');
+        return TebReturn.error('Foi encontrada mais de uma sessão com este código, por isso não é possível continuar.');
       }
 
       _currentSession = Session.fromMap(dataList.first);
@@ -109,13 +109,13 @@ class SessionController with ChangeNotifier {
       var localDataController = LocalDataController();
       localDataController.saveSession(session: _currentSession);
 
-      return TebCustomReturn.sucess;
+      return TebReturn.sucess;
     } catch (e) {
-      return TebCustomReturn.error('Erro! ${e.toString()}');
+      return TebReturn.error('Erro! ${e.toString()}');
     }
   }
 
-  Future<TebCustomReturn> getCurrentSessionByFeedbackCode({required String feedbackCode}) async {
+  Future<TebReturn> getCurrentSessionByFeedbackCode({required String feedbackCode}) async {
     try {
       var sessionQuery =
           await FirebaseFirestore.instance
@@ -125,8 +125,8 @@ class SessionController with ChangeNotifier {
 
       final dataList = sessionQuery.docs.map((doc) => doc.data()).toList();
 
-      if (dataList.isEmpty) return TebCustomReturn.error('Não foi encontrada uma sessão com este código');
-      if (dataList.length > 1) return TebCustomReturn.error('Foi encontrada mais de uma sessão com este código');
+      if (dataList.isEmpty) return TebReturn.error('Não foi encontrada uma sessão com este código');
+      if (dataList.length > 1) return TebReturn.error('Foi encontrada mais de uma sessão com este código');
 
       _currentSession = Session.fromMap(dataList.first);
 
@@ -135,20 +135,20 @@ class SessionController with ChangeNotifier {
 
       _givenFeedbackCodeList = localDataController.othersSessionFeedbackIdList;
 
-      return TebCustomReturn.sucess;
+      return TebReturn.sucess;
     } catch (e) {
-      return TebCustomReturn.error('Erro! ${e.toString()}');
+      return TebReturn.error('Erro! ${e.toString()}');
     }
   }
 
-  Future<TebCustomReturn> delete({required Session session}) async {
+  Future<TebReturn> delete({required Session session}) async {
     try {
       await FirebaseFirestore.instance.collection(Session.colletcionName).doc(session.id).delete();
 
       notifyListeners();
-      return TebCustomReturn.sucess;
+      return TebReturn.sucess;
     } catch (e) {
-      return TebCustomReturn.error(e.toString());
+      return TebReturn.error(e.toString());
     }
   }
 }

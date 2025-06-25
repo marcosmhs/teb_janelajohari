@@ -12,7 +12,7 @@ class UserController with ChangeNotifier {
 
   User get currentUser => _currentUser;
 
-  Future<TebCustomReturn> login({required User user}) async {
+  Future<TebReturn> login({required User user}) async {
     try {
       final credential = await fb_auth.FirebaseAuth.instance.signInWithEmailAndPassword(
         email: user.email,
@@ -27,14 +27,14 @@ class UserController with ChangeNotifier {
       }
     } on fb_auth.FirebaseAuthException catch (e) {
       AdmAccessLogController().add(email: user.email, success: false, observation: e.code);
-      return TebCustomReturn.authSignUpError(e.code);
+      return TebReturn.authSignUpError(e.code);
     } catch (e) {
       AdmAccessLogController().add(email: user.email, success: false, observation: e.toString());
-      return TebCustomReturn.error(e.toString());
+      return TebReturn.error(e.toString());
     }
 
     notifyListeners();
-    return TebCustomReturn.sucess;
+    return TebReturn.sucess;
   }
 
   void logoff() {
@@ -66,14 +66,14 @@ class UserController with ChangeNotifier {
     return User.fromMap(map: userData, setEmail: setEmail, setToken: setToken);
   }
 
-  Future<TebCustomReturn> save({required User user}) async {
+  Future<TebReturn> save({required User user}) async {
     try {
       if (user.id.isEmpty) {
         final credential = await fb_auth.FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: user.email,
           password: TebUtil.encrypt(user.password),
         );
-        if (credential.user == null) return TebCustomReturn.error('Erro ao criar usuário');
+        if (credential.user == null) return TebReturn.error('Erro ao criar usuário');
 
         if (fb_auth.FirebaseAuth.instance.currentUser != null) {
           fb_auth.FirebaseAuth.instance.currentUser!.updateDisplayName(user.name);
@@ -105,11 +105,11 @@ class UserController with ChangeNotifier {
 
       _currentUser = User.fromMap(map: user.toMap());
 
-      return TebCustomReturn.sucess;
+      return TebReturn.sucess;
     } on fb_auth.FirebaseException catch (e) {
-      return TebCustomReturn.error(e.code);
+      return TebReturn.error(e.code);
     } catch (e) {
-      return TebCustomReturn.error(e.toString());
+      return TebReturn.error(e.toString());
     }
   }
 

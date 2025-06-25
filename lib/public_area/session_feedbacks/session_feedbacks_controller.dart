@@ -9,7 +9,7 @@ import 'package:teb_package/util/teb_uid_generator.dart';
 class SessionFeedbackController with ChangeNotifier {
   SessionFeedbackController();
 
-  Future<TebCustomReturn> save({required SessionFeedbacks sessionFeedbacks, required Session session}) async {
+  Future<TebReturn> save({required SessionFeedbacks sessionFeedbacks, required Session session}) async {
     try {
       if (sessionFeedbacks.id.isEmpty) {
         sessionFeedbacks.id = TebUidGenerator.firestoreUid;
@@ -30,9 +30,9 @@ class SessionFeedbackController with ChangeNotifier {
         );
       }
 
-      return TebCustomReturn.sucess;
+      return TebReturn.sucess;
     } catch (e) {
-      return TebCustomReturn.error(e.toString());
+      return TebReturn.error(e.toString());
     }
   }
 

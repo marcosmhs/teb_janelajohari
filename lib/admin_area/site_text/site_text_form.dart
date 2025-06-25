@@ -59,18 +59,18 @@ class _SiteTextFormState extends State<SiteTextForm> {
       // salva os dados
       _formKey.currentState?.save();
       var siteTextController = SiteTextController();
-      TebCustomReturn retorno;
+      TebReturn retorno;
       try {
         retorno = await siteTextController.save(siteTextList: _siteTextList);
 
         if (retorno.returnType == TebReturnType.sucess) {
-          TebCustomMessage.sucess(context, message: 'Dados alterados com sucesso');
+          TebMessage.sucess(context, message: 'Dados alterados com sucesso');
           Navigator.of(context).pushReplacementNamed(Routes.adminAreaScreen, arguments: {'user': _user});
         }
 
         // se houve um erro no login ou no cadastro exibe o erro
         if (retorno.returnType == TebReturnType.error) {
-          TebCustomMessage.error(context, message: retorno.message);
+          TebMessage.error(context, message: retorno.message);
         }
       } finally {
         _saveingData = false;
@@ -426,7 +426,7 @@ class _SiteTextFormState extends State<SiteTextForm> {
       return AdminAreaInvalidAccessScreen();
     }
 
-    return TebCustomScaffold(
+    return TebScaffold(
       title: Text('Textos'),
       responsive: false,
       fixedWidth: MediaQuery.of(context).size.width * 0.9,

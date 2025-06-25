@@ -2,6 +2,7 @@
 
 // ignore: depend_on_referenced_packages
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:teb_janelajohari/main/widgets/about_jorari_window_area.dart';
 import 'package:teb_janelajohari/main/widgets/contact_area.dart';
@@ -9,7 +10,9 @@ import 'package:teb_janelajohari/main/widgets/how_it_works_area.dart';
 import 'package:teb_janelajohari/main/widgets/site_title_widget.dart';
 import 'package:teb_janelajohari/main/widgets/social_links_area.dart';
 import 'package:teb_janelajohari/public_area/wellcome_screen/widgets/find_session_widget.dart';
+import 'package:teb_janelajohari/public_area/wellcome_screen/widgets/floating_menu_widget.dart';
 import 'package:teb_janelajohari/public_area/wellcome_screen/widgets/new_session_widget.dart';
+import 'package:teb_package/screen_widgets/teb_expandable_fab/teb_expandable_fab.dart';
 import 'package:teb_package/teb_package.dart';
 
 class WellcomeScreen extends StatefulWidget {
@@ -23,20 +26,14 @@ class _WellcomeScreenState extends State<WellcomeScreen> {
   late AutoScrollController _autoScrollController;
   final _scrollDirection = Axis.vertical;
 
+  final _key = GlobalKey<TebExpandableFabState>();
+
   @override
   void initState() {
     _autoScrollController = AutoScrollController(
       viewportBoundaryGetter: () => Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
       axis: _scrollDirection,
-    )..addListener(() {
-      //_isAppBarExpanded
-      //    ? _isExpaned != false
-      //        ? setState(() => _isExpaned = false)
-      //        : {}
-      //    : _isExpaned != true
-      //    ? setState(() => _isExpaned = true)
-      //    : {};
-    });
+    )..addListener(() {});
     super.initState();
   }
 
@@ -49,12 +46,19 @@ class _WellcomeScreenState extends State<WellcomeScreen> {
     return AutoScrollTag(key: ValueKey(index), controller: _autoScrollController, index: index, child: child);
   }
 
-  Widget _appBarTitle({required String text}) {
+  Widget _appBarTitle({required String text, bool bold = false}) {
     return Tab(
       child: InkWell(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: TebText(text, textAlign: TextAlign.center, textSize: 14, letterSpacing: 2, textColor: Colors.black),
+          child: TebText(
+            text,
+            textAlign: TextAlign.center,
+            textSize: bold ? 16 : 14,
+            letterSpacing: 2,
+            textColor: Colors.black,
+            textWeight: bold ? FontWeight.bold : FontWeight.normal,
+          ),
         ),
       ),
     );
@@ -65,8 +69,8 @@ class _WellcomeScreenState extends State<WellcomeScreen> {
 
     tabList.add(_appBarTitle(text: 'O que é'));
     tabList.add(_appBarTitle(text: 'Como funciona'));
-    tabList.add(_appBarTitle(text: 'Criar sua sessão'));
-    tabList.add(_appBarTitle(text: 'Dar Feedback'));
+    tabList.add(_appBarTitle(text: 'Criar sua sessão', bold: true));
+    tabList.add(_appBarTitle(text: 'Dar Feedback', bold: true));
 
     return Column(
       children: [
@@ -99,9 +103,10 @@ class _WellcomeScreenState extends State<WellcomeScreen> {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
-    return TebCustomScaffold(
+    return TebScaffold(
       showAppBar: false,
       responsive: false,
+
       body: SingleChildScrollView(
         physics: const ScrollPhysics(),
         primary: true,

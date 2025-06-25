@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:teb_janelajohari/main/widgets/area_title_widget.dart';
 import 'package:teb_janelajohari/routes.dart';
-import 'package:teb_package/visual_elements/teb_buttons_line.dart';
-import 'package:teb_package/visual_elements/teb_text.dart';
+import 'package:teb_package/control_widgets/teb_buttons_line.dart';
+import 'package:teb_package/control_widgets/teb_text.dart';
 
 class NewSessionWidget extends StatelessWidget {
   final Size size;

@@ -5,12 +5,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:teb_janelajohari/admin_area/user/user.dart';
 import 'package:teb_janelajohari/admin_area/user/user_controller.dart';
 import 'package:teb_janelajohari/routes.dart';
+import 'package:teb_package/control_widgets/teb_text.dart';
+import 'package:teb_package/control_widgets/teb_text_edit.dart';
 import 'package:teb_package/messaging/teb_custom_dialog.dart';
-import 'package:teb_package/screen_elements/teb_custom_scaffold.dart';
+import 'package:teb_package/screen_widgets/teb_scaffold.dart';
 import 'package:teb_package/util/teb_return.dart';
 import 'package:teb_package/util/teb_util.dart';
-import 'package:teb_package/visual_elements/teb_text.dart';
-import 'package:teb_package/visual_elements/teb_text_form_field.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -42,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // salva os dados
       _formKey.currentState?.save();
       var userController = UserController();
-      TebCustomReturn retorno;
+      TebReturn retorno;
       try {
         User user = User();
         user.email = _email;
@@ -70,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (_email.isNotEmpty) _emailController.text = _email;
     }
 
-    return TebCustomScaffold(
+    return TebScaffold(
       responsive: false,
       showAppBar: false,
       title: const Text('Login'),

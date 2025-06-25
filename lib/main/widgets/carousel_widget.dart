@@ -1,13 +1,13 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:teb_package/visual_elements/teb_text.dart';
+import 'package:teb_package/control_widgets/teb_text.dart';
 
 class CarouselWidget extends StatelessWidget {
   final Size size;
   final bool mobile;
-  final List<Map<String, dynamic>> carouselItems;
-  const CarouselWidget({super.key, required this.size, required this.carouselItems, required this.mobile});
+  final List<Map<String, dynamic>> items;
+  const CarouselWidget({super.key, required this.size, required this.items, required this.mobile});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class CarouselWidget extends StatelessWidget {
         scrollDirection: Axis.horizontal,
       ),
       items:
-          carouselItems.map((item) {
+          items.map((item) {
             return Builder(
               builder: (BuildContext context) {
                 return Container(

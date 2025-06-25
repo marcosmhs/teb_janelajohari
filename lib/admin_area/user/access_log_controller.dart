@@ -8,7 +8,7 @@ import 'package:teb_package/util/teb_uid_generator.dart';
 class AdmAccessLogController with ChangeNotifier {
   final _accessCollectionName = 'admAccessLog';
 
-  Future<TebCustomReturn> add({required String email, required bool success, String observation = ''}) async {
+  Future<TebReturn> add({required String email, required bool success, String observation = ''}) async {
     try {
       var accessLog = AccessLog(
         id: TebUidGenerator.accessLogUid,
@@ -20,9 +20,9 @@ class AdmAccessLogController with ChangeNotifier {
 
       await FirebaseFirestore.instance.collection(_accessCollectionName).doc(accessLog.id).set(accessLog.toMap());
 
-      return TebCustomReturn.sucess;
+      return TebReturn.sucess;
     } catch (e) {
-      return TebCustomReturn.error(e.toString());
+      return TebReturn.error(e.toString());
     }
   }
 }

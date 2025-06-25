@@ -13,13 +13,12 @@ import 'package:teb_janelajohari/main/widgets/title_bar_widget.dart';
 import 'package:teb_janelajohari/public_area/session_feedbacks/session_feedbacks.dart';
 import 'package:teb_janelajohari/public_area/session/session.dart';
 import 'package:teb_janelajohari/routes.dart';
-import 'package:teb_package/messaging/teb_custom_message.dart';
-import 'package:teb_package/screen_elements/teb_custom_scaffold.dart';
+import 'package:teb_package/control_widgets/teb_buttons_line.dart';
+import 'package:teb_package/control_widgets/teb_text.dart';
+import 'package:teb_package/control_widgets/teb_text_edit.dart';
+import 'package:teb_package/messaging/teb_message.dart';
+import 'package:teb_package/screen_widgets/teb_scaffold.dart';
 import 'package:teb_package/util/teb_return.dart';
-
-import 'package:teb_package/visual_elements/teb_buttons_line.dart';
-import 'package:teb_package/visual_elements/teb_text.dart';
-import 'package:teb_package/visual_elements/teb_text_form_field.dart';
 
 class FeedbackScreen extends StatefulWidget {
   final Session? session;
@@ -75,7 +74,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         } else {
           try {
             if (adjectiveController.text == '') {
-              TebCustomMessage.error(context, message: 'Você não informou o adjetivo');
+              TebMessage.error(context, message: 'Você não informou o adjetivo');
               return;
             }
             if (_savingCustomAdjective) return;
@@ -87,7 +86,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             if (adjetivesList.where((e) {
               return removeDiacritics(e.toUpperCase().trim()) == removeDiacritics(adjectiveController.text.toUpperCase().trim());
             }).isNotEmpty) {
-              TebCustomMessage.error(context, message: 'Já existe um adjetivo com este nome');
+              TebMessage.error(context, message: 'Já existe um adjetivo com este nome');
               return;
             }
 
@@ -145,7 +144,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     backgroundColor: color.withAlpha(50),
                     onSelected: (bool selected) {
                       if (_sessionFeedbacks.totalAdjectivesLengh >= 10 && selected) {
-                        TebCustomMessage.error(context, message: 'Selecione no máximo 10 adjetivos!');
+                        TebMessage.error(context, message: 'Selecione no máximo 10 adjetivos!');
                         return;
                       }
                       setState(() {
@@ -167,25 +166,25 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
   void _submit() async {
     if (_sessionFeedbacks.totalAdjectivesLengh < 5) {
-      TebCustomMessage.error(context, message: 'Selecione entre 5 e 10 adjetivos antes de concluir');
+      TebMessage.error(context, message: 'Selecione entre 5 e 10 adjetivos antes de concluir');
       return;
     }
 
     if (_session.id.isEmpty) {
-      TebCustomMessage.error(context, message: 'Estranho, sessão não encontrada!');
+      TebMessage.error(context, message: 'Estranho, sessão não encontrada!');
       return;
     }
 
     var sessionVotesController = SessionFeedbackController();
-    TebCustomReturn retorno;
+    TebReturn retorno;
 
     retorno = await sessionVotesController.save(sessionFeedbacks: _sessionFeedbacks, session: _session);
 
-    if (retorno != TebCustomReturn.sucess) {
-      TebCustomMessage.error(context, message: retorno.message);
+    if (retorno != TebReturn.sucess) {
+      TebMessage.error(context, message: retorno.message);
     }
 
-    TebCustomMessage.sucess(
+    TebMessage.sucess(
       context,
       message:
           _sessionFeedbacks.feedbackType == FeedbackType.self
@@ -195,13 +194,13 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     if (_sessionFeedbacks.feedbackType == FeedbackType.self) {
       LocalDataController().saveSession(session: _session);
       Navigator.of(context).popAndPushNamed(Routes.landingScreen);
-      TebCustomMessage.sucess(
+      TebMessage.sucess(
         context,
         message:
             'Reflexão individual salva com sucesso!, agora compartilhe o link de avaliação com as pessoas que podem contribuir com seu desenvolvimento',
       );
     } else {
-      TebCustomMessage(
+      TebMessage(
         context: context,
         messageText: 'Feedback salvo com sucesso, que tal aproveitar este momento para iniciar uma sessão de autoavaliação',
         messageType: TebMessageType.sucess,
@@ -257,7 +256,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
     var size = MediaQuery.of(context).size;
 
-    return TebCustomScaffold(
+    return TebScaffold(
       responsive: false,
       showAppBar: false,
       fixedWidth: size.width * 0.9,

@@ -84,7 +84,7 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
     if (_user.id.isEmpty) {
       return AdminAreaInvalidAccessScreen();
     } else {
-      return TebCustomScaffold(
+      return TebScaffold(
         appBar: AppBar(title: TebText('Janela de Johari - That Exotic Bug')),
         showAppBar: true,
         drawer: _menuItens(),
@@ -217,7 +217,7 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
                   label: 'Copiar texto',
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: _str));
-                    TebCustomMessage.sucess(context, message: 'Texto copiado para sua área de transferência!');
+                    TebMessage.sucess(context, message: 'Texto copiado para sua área de transferência!');
                   },
                 ),
               ],

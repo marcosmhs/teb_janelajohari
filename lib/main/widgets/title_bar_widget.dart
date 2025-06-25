@@ -5,8 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:teb_janelajohari/main/widgets/site_title_widget.dart';
 import 'package:teb_janelajohari/public_area/session/session.dart';
 import 'package:teb_janelajohari/public_area/session_feedbacks/session_feedbacks.dart';
-import 'package:teb_package/messaging/teb_custom_message.dart';
-import 'package:teb_package/visual_elements/teb_text.dart';
+import 'package:teb_package/control_widgets/teb_text.dart';
+import 'package:teb_package/messaging/teb_message.dart';
 
 class TitleBarWidget extends StatefulWidget {
   final Session session;
@@ -50,7 +50,7 @@ class _TitleBarWidgetState extends State<TitleBarWidget> {
         InkWell(
           onTap: () {
             Clipboard.setData(ClipboardData(text: widget.session.accessCode)).then(
-              (value) => TebCustomMessage(
+              (value) => TebMessage(
                 context: context,
                 messageText: 'Código da sessão copiado para a área de transferência',
                 messageType: TebMessageType.info,
@@ -86,7 +86,7 @@ class _TitleBarWidgetState extends State<TitleBarWidget> {
         InkWell(
           onTap: () {
             Clipboard.setData(ClipboardData(text: widget.session.sessionFeedbackUrl)).then(
-              (value) => TebCustomMessage(
+              (value) => TebMessage(
                 context: context,
                 messageText: 'Link copiado para a área de transferência',
                 messageType: TebMessageType.info,

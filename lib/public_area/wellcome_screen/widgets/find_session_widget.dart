@@ -5,11 +5,11 @@ import 'package:teb_janelajohari/local_data_controller.dart';
 import 'package:teb_janelajohari/main/widgets/area_title_widget.dart';
 import 'package:teb_janelajohari/public_area/session/session_controller.dart';
 import 'package:teb_janelajohari/routes.dart';
-import 'package:teb_package/messaging/teb_custom_message.dart';
+import 'package:teb_package/control_widgets/teb_buttons_line.dart';
+import 'package:teb_package/control_widgets/teb_text.dart';
+import 'package:teb_package/control_widgets/teb_text_edit.dart';
+import 'package:teb_package/messaging/teb_message.dart';
 import 'package:teb_package/util/teb_return.dart';
-import 'package:teb_package/visual_elements/teb_buttons_line.dart';
-import 'package:teb_package/visual_elements/teb_text.dart';
-import 'package:teb_package/visual_elements/teb_text_form_field.dart';
 
 class FindSessionWidget extends StatefulWidget {
   final Size size;
@@ -34,7 +34,7 @@ class _FindSessionWidgetState extends State<FindSessionWidget> {
       _sendingData = true;
       try {
         if (_sessionAccessCodeController.text.isEmpty) {
-          TebCustomMessage.error(context, message: 'Ops, você não informou o código de acesso da sessão');
+          TebMessage.error(context, message: 'Ops, você não informou o código de acesso da sessão');
           return;
         }
 
@@ -43,7 +43,7 @@ class _FindSessionWidgetState extends State<FindSessionWidget> {
         var customReturn = await sessionController.getCurrentSessionByAccessCode(accessCode: _sessionAccessCodeController.text);
 
         if (customReturn.returnType == TebReturnType.error) {
-          TebCustomMessage.error(context, message: customReturn.message);
+          TebMessage.error(context, message: customReturn.message);
           return;
         }
         LocalDataController().saveSession(session: sessionController.currentSession);

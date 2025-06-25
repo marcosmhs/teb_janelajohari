@@ -13,12 +13,11 @@ import 'package:teb_janelajohari/main/widgets/title_bar_widget.dart';
 import 'package:teb_janelajohari/public_area/session/session.dart';
 import 'package:teb_janelajohari/local_data_controller.dart';
 import 'package:teb_janelajohari/routes.dart';
+import 'package:teb_package/control_widgets/teb_buttons_line.dart';
+import 'package:teb_package/control_widgets/teb_text.dart';
+import 'package:teb_package/messaging/teb_message.dart';
+import 'package:teb_package/screen_widgets/teb_scaffold.dart';
 
-import 'package:teb_package/messaging/teb_custom_dialog.dart';
-import 'package:teb_package/messaging/teb_custom_message.dart';
-import 'package:teb_package/screen_elements/teb_custom_scaffold.dart';
-import 'package:teb_package/visual_elements/teb_buttons_line.dart';
-import 'package:teb_package/visual_elements/teb_text.dart';
 
 class JohariScreen extends StatefulWidget {
   final Session? session;
@@ -35,22 +34,77 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
   var _mobile = false;
   var _showOthersFeedbackOrderedByAdjectiveName = true;
 
-  final ExpansionTileController expansionTileControllerFeedbacks = ExpansionTileController();
-  final ExpansionTileController expansionTileControllerJohariScreen = ExpansionTileController();
-  final ExpansionTileController expansionTileControllerAiPrompt = ExpansionTileController();
+  final ExpansibleController  expansionTileControllerFeedbacks = ExpansibleController ();
+  final ExpansibleController  expansionTileControllerJohariScreen = ExpansibleController ();
+  final ExpansibleController  expansionTileControllerAiPrompt = ExpansibleController ();
 
   void _confirmExit() {
-    TebCustomDialog(context: context)
-        .confirmationDialog(
-          message:
-              'Tem certeza que deseja encerrar esta sessão?\n\nCertifique-se de que salvou seu código de acesso (${_session.accessCode}) para acessá-la novamente no futuro.',
-        )
-        .then((response) {
-          if (response == true) {
-            LocalDataController().clearSessionData();
-            Navigator.of(context).popAndPushNamed(Routes.landingScreen, arguments: {'ignoreQueryParameters': true});
-          }
-        });
+    showDialog<bool>(
+      useSafeArea: false,
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            content: SizedBox(
+              width: _mobile ? 300 : 600,
+              height: _mobile ? 500 : 320,
+              child: Row(
+                children: [
+                  if (!_mobile) Icon(FontAwesomeIcons.handPointUp, size: 80, color: Theme.of(context).colorScheme.tertiary),
+                  if (!_mobile) const SizedBox(width: 20),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (_mobile) Icon(FontAwesomeIcons.handPointUp, size: 50, color: Theme.of(context).colorScheme.tertiary),
+                        if (_mobile) const SizedBox(height: 20),
+                        TebText(
+                          'Lembre-se de salvar os dados de acesso e convite para feedback',
+                          textSize: 24,
+                          textType: TextType.html,
+                          textWeight: FontWeight.bold,
+                          padding: const EdgeInsets.only(bottom: 10),
+                        ),
+                        TebText(
+                          'Seu código de acesso (<b>${_session.accessCode}</b>) será necessário para acessar seus feedbacks posteriormente',
+                          textSize: 16,
+                          textType: TextType.html,
+                          padding: const EdgeInsets.only(bottom: 10),
+                        ),
+                        TebText(
+                          'Guarde-o em um lugar de fácil acesso para que possa usá-lo novamente no futuro :)',
+                          textSize: 16,
+                          textType: TextType.html,
+                          padding: const EdgeInsets.only(bottom: 10),
+                        ),
+                        TebButton(
+                          buttonType: TebButtonType.outlinedButton,
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(text: _session.accessCode));
+                            Navigator.of(ctx).pop(true);
+                            TebMessage.sucess(context, message: 'Código de acesso copiado para sua área de transferência!');
+                          },
+                          size: Size(_mobile ? 350 : 450, 90),
+                          child: TebText(
+                            'Clique aqui para copiar seu <b>código de acesso</b> para a área de transferência e deixar sua sessão',
+                            textSize: 16,
+                            textAlign: _mobile ? TextAlign.center : null,
+                            textType: TextType.html,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+    ).then((value) async {
+      if ((value ?? false) == true) {
+        LocalDataController().clearSessionData();
+        Navigator.of(context).popAndPushNamed(Routes.landingScreen, arguments: {'ignoreQueryParameters': true});
+      }
+    });
   }
 
   Widget _adjectiveController({
@@ -304,7 +358,7 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
     required bool mobile,
     required String title,
     required String? subtitle,
-    required ExpansionTileController controller,
+    required ExpansibleController  controller,
     required Widget children,
   }) {
     return ExpansionTile(
@@ -368,7 +422,7 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
 
         var feedbacks = SessionFeedbackController.getAllAreasFeedback(feedbacks: sessionFeedbacks);
 
-        return TebCustomScaffold(
+        return TebScaffold(
           responsive: false,
           showAppBar: false,
           fixedWidth: size.width * 0.9,
@@ -530,7 +584,7 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
                           label: 'Copiar texto',
                           onPressed: () {
                             Clipboard.setData(ClipboardData(text: _getIAText(feedbacks)));
-                            TebCustomMessage.sucess(context, message: 'Texto copiado para sua área de transferência!');
+                            TebMessage.sucess(context, message: 'Texto copiado para sua área de transferência!');
                           },
                         ),
                       ],

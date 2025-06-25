@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:teb_janelajohari/routes.dart';
-import 'package:teb_package/screen_elements/teb_custom_scaffold.dart';
-import 'package:teb_package/visual_elements/teb_buttons_line.dart';
-import 'package:teb_package/visual_elements/teb_text.dart';
+import 'package:teb_package/control_widgets/teb_buttons_line.dart';
+import 'package:teb_package/control_widgets/teb_text.dart';
+import 'package:teb_package/screen_widgets/teb_scaffold.dart';
 
 class ErrorScreen extends StatelessWidget {
   final String errorMessage;
@@ -13,7 +13,7 @@ class ErrorScreen extends StatelessWidget {
     final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
     var finalMessage = arguments['errorMessage'] ?? errorMessage;
 
-    return TebCustomScaffold(
+    return TebScaffold(
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,

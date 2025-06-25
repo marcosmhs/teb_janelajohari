@@ -9,7 +9,7 @@ import 'package:flutter/foundation.dart';
 class CarouselTextController with ChangeNotifier {
   CarouselTextController();
 
-  Future<TebCustomReturn> save({required CarouselText carouselText}) async {
+  Future<TebReturn> save({required CarouselText carouselText}) async {
     try {
       if (carouselText.id.isEmpty) {
         carouselText.id = TebUidGenerator.firestoreUid;
@@ -18,9 +18,9 @@ class CarouselTextController with ChangeNotifier {
       await FirebaseFirestore.instance.collection(CarouselText.colletcionName).doc(carouselText.id).set(carouselText.toMap);
 
       notifyListeners();
-      return TebCustomReturn.sucess;
+      return TebReturn.sucess;
     } catch (e) {
-      return TebCustomReturn.error(e.toString());
+      return TebReturn.error(e.toString());
     }
   }
 
@@ -43,14 +43,14 @@ class CarouselTextController with ChangeNotifier {
     return r;
   }
 
-  Future<TebCustomReturn> delete({required CarouselText carouselText}) async {
+  Future<TebReturn> delete({required CarouselText carouselText}) async {
     try {
       await FirebaseFirestore.instance.collection(CarouselText.colletcionName).doc(carouselText.id).delete();
 
       notifyListeners();
-      return TebCustomReturn.sucess;
+      return TebReturn.sucess;
     } catch (e) {
-      return TebCustomReturn.error(e.toString());
+      return TebReturn.error(e.toString());
     }
   }
 }

@@ -5,12 +5,12 @@ import 'package:teb_janelajohari/admin_area/admin_area_invalid_access_screen.dar
 import 'package:teb_janelajohari/admin_area/user/user.dart';
 import 'package:teb_janelajohari/admin_area/user/user_controller.dart';
 import 'package:teb_janelajohari/routes.dart';
-import 'package:teb_package/messaging/teb_custom_message.dart';
-import 'package:teb_package/screen_elements/teb_custom_scaffold.dart';
+import 'package:teb_package/control_widgets/teb_buttons_line.dart';
+import 'package:teb_package/control_widgets/teb_text.dart';
+import 'package:teb_package/control_widgets/teb_text_edit.dart';
+import 'package:teb_package/messaging/teb_message.dart';
+import 'package:teb_package/screen_widgets/teb_scaffold.dart';
 import 'package:teb_package/util/teb_return.dart';
-import 'package:teb_package/visual_elements/teb_buttons_line.dart';
-import 'package:teb_package/visual_elements/teb_text.dart';
-import 'package:teb_package/visual_elements/teb_text_form_field.dart';
 
 class UserForm extends StatefulWidget {
   const UserForm({super.key});
@@ -45,17 +45,17 @@ class _UserFormState extends State<UserForm> {
       // salva os dados
       _formKey.currentState?.save();
       var userController = UserController();
-      TebCustomReturn retorno;
+      TebReturn retorno;
       try {
         retorno = await userController.save(user: _user);
         if (retorno.returnType == TebReturnType.sucess) {
-          TebCustomMessage.sucess(context, message: 'Dados Alterado com sucesso');
+          TebMessage.sucess(context, message: 'Dados Alterado com sucesso');
           Navigator.of(context).pushReplacementNamed(Routes.adminAreaScreen, arguments: {'user': _user});
         }
 
         // se houve um erro no login ou no cadastro exibe o erro
         if (retorno.returnType == TebReturnType.error) {
-          TebCustomMessage.error(context, message: retorno.message);
+          TebMessage.error(context, message: retorno.message);
         }
       } finally {
         _saveingData = false;
@@ -83,7 +83,7 @@ class _UserFormState extends State<UserForm> {
     if (_user.id.isEmpty) {
       return AdminAreaInvalidAccessScreen();
     } else {
-      return TebCustomScaffold(
+      return TebScaffold(
         appBar: AppBar(title: TebText('Janela de Johari - That Exotic Bug')),
         body: SingleChildScrollView(
           child: Form(
