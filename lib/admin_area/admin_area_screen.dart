@@ -37,19 +37,19 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
               onTap: () => Navigator.of(context).pushNamed(Routes.userForm, arguments: {'user': _user}),
               child: CircleAvatar(child: Icon(FontAwesomeIcons.user, color: Theme.of(context).colorScheme.primary, size: 50)),
             ),
-            accountName: TebText(_user.name, textColor: Theme.of(context).colorScheme.surface),
-            accountEmail: TebText(_user.email, textColor: Theme.of(context).colorScheme.surface),
+            accountName: TebText(_user.name, fontColor: Theme.of(context).colorScheme.surface),
+            accountEmail: TebText(_user.email, fontColor: Theme.of(context).colorScheme.surface),
           ),
           ListTile(
             leading: FaIcon(FontAwesomeIcons.palette, color: Theme.of(context).colorScheme.primary),
-            title: TebText('Textos', textColor: Theme.of(context).colorScheme.primary),
+            title: TebText('Textos', fontColor: Theme.of(context).colorScheme.primary),
             onTap: () => Navigator.of(context).pushNamed(Routes.siteTextForm, arguments: {'user': _user}),
           ),
 
           const SizedBox(height: 10),
           TebText(
             "v${_info.version}.${_info.buildNumber}",
-            textColor: Theme.of(context).colorScheme.primary,
+            fontColor: Theme.of(context).colorScheme.primary,
             padding: const EdgeInsets.only(bottom: 10),
           ),
         ],
@@ -102,7 +102,7 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
                     Icon(FontAwesomeIcons.hashtag),
                     TebText(
                       'Quantidade de sessões criadas: ${_sessionStats['sessionsCount']}',
-                      textSize: 16,
+                      fontSize: 16,
                       padding: EdgeInsets.all(10),
                     ),
                   ],
@@ -113,7 +113,7 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
                       Icon(FontAwesomeIcons.calendar),
                       TebText(
                         'Última sessão criada em: ${TebUtil.dateTimeFormat(date: _sessionStats['lastSession']!, mask: 'dd/MM/yyyy HH:mm')}',
-                        textSize: 16,
+                        fontSize: 16,
                         padding: EdgeInsets.all(10),
                       ),
                     ],
@@ -124,7 +124,7 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
                     Icon(FontAwesomeIcons.hashtag),
                     TebText(
                       'Quantidade de feedbacks: ${_feedbackStats['sessionFeedbacksCount']}',
-                      textSize: 16,
+                      fontSize: 16,
                       padding: EdgeInsets.all(10),
                     ),
                   ],
@@ -135,7 +135,7 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
                       Icon(FontAwesomeIcons.calendar),
                       TebText(
                         'Último feedback em: ${TebUtil.dateTimeFormat(date: _feedbackStats['lastFeedback']!, mask: 'dd/MM/yyyy HH:mm')}',
-                        textSize: 16,
+                        fontSize: 16,
                         padding: EdgeInsets.all(10),
                       ),
                     ],
@@ -145,7 +145,7 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
                     Icon(FontAwesomeIcons.hashtag),
                     TebText(
                       'Quantidade de adjetivos utilizados: ${_feedbackStats['totalAdjectives']}',
-                      textSize: 16,
+                      fontSize: 16,
                       padding: EdgeInsets.all(10),
                     ),
                   ],
@@ -155,7 +155,7 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
                     Icon(FontAwesomeIcons.comment),
                     TebText(
                       'Quantidade de comentários: ${_feedbackStats['totalComments']}',
-                      textSize: 16,
+                      fontSize: 16,
                       padding: EdgeInsets.all(10),
                     ),
                   ],
@@ -165,7 +165,7 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
                   ExpansionTile(
                     title: TebText(
                       'Adjetivos positivos utilizados (${_feedbackStats['positiveAdjectivesCount'].length})',
-                      textSize: 16,
+                      fontSize: 16,
                       padding: EdgeInsets.all(10),
                     ),
                     children: [
@@ -179,7 +179,7 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
                           final count = _feedbackStats['positiveAdjectivesCount'][adjective];
                           return ListTile(
                             leading: Icon(FontAwesomeIcons.tag, color: Theme.of(context).colorScheme.primary),
-                            title: TebText('$adjective: $count', textSize: 16),
+                            title: TebText('$adjective: $count', fontSize: 16),
                           );
                         },
                       ),
@@ -190,7 +190,7 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
                   ExpansionTile(
                     title: TebText(
                       'Adjetivos construtivos utilizados (${_feedbackStats['constructiveAdjectivesCount'].length})',
-                      textSize: 16,
+                      fontSize: 16,
                       padding: EdgeInsets.all(10),
                     ),
                     children: [
@@ -204,7 +204,7 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
                           final count = _feedbackStats['constructiveAdjectivesCount'][adjective];
                           return ListTile(
                             leading: Icon(FontAwesomeIcons.tag, color: Theme.of(context).colorScheme.primary),
-                            title: TebText('$adjective: $count', textSize: 16),
+                            title: TebText('$adjective: $count', fontSize: 16),
                           );
                         },
                       ),
@@ -217,7 +217,7 @@ class _AdminAreaScreenState extends State<AdminAreaScreen> {
                   label: 'Copiar texto',
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: _str));
-                    TebMessage.sucess(context, message: 'Texto copiado para sua área de transferência!');
+                    TebMessage.success(context, message: 'Texto copiado para sua área de transferência!');
                   },
                 ),
               ],

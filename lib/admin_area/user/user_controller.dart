@@ -34,7 +34,7 @@ class UserController with ChangeNotifier {
     }
 
     notifyListeners();
-    return TebReturn.sucess;
+    return TebReturn.success;
   }
 
   void logoff() {
@@ -105,7 +105,7 @@ class UserController with ChangeNotifier {
 
       _currentUser = User.fromMap(map: user.toMap());
 
-      return TebReturn.sucess;
+      return TebReturn.success;
     } on fb_auth.FirebaseException catch (e) {
       return TebReturn.error(e.code);
     } catch (e) {

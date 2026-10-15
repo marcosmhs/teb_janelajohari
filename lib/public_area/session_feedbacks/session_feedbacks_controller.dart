@@ -17,9 +17,9 @@ class SessionFeedbackController with ChangeNotifier {
       }
 
       await FirebaseFirestore.instance
-          .collection(Session.colletcionName)
+          .collection(Session.collectionName)
           .doc(session.id)
-          .collection(SessionFeedbacks.colletcionName)
+          .collection(SessionFeedbacks.collectionName)
           .doc(sessionFeedbacks.id)
           .set(sessionFeedbacks.toMap);
 
@@ -30,7 +30,7 @@ class SessionFeedbackController with ChangeNotifier {
         );
       }
 
-      return TebReturn.sucess;
+      return TebReturn.success;
     } catch (e) {
       return TebReturn.error(e.toString());
     }
@@ -40,9 +40,9 @@ class SessionFeedbackController with ChangeNotifier {
     try {
       var feedbacks = <SessionFeedbacks>[];
       var collectionRef = FirebaseFirestore.instance
-          .collection(Session.colletcionName)
+          .collection(Session.collectionName)
           .doc(sessionId)
-          .collection(SessionFeedbacks.colletcionName);
+          .collection(SessionFeedbacks.collectionName);
 
       Query query = collectionRef;
       if (feedbackType != null) {
@@ -67,9 +67,9 @@ class SessionFeedbackController with ChangeNotifier {
     try {
       var querySnapshot =
           await FirebaseFirestore.instance
-              .collection(Session.colletcionName)
+              .collection(Session.collectionName)
               .doc(sessionId)
-              .collection(SessionFeedbacks.colletcionName)
+              .collection(SessionFeedbacks.collectionName)
               .doc(sessionFeedbackId)
               .get();
 
@@ -86,9 +86,9 @@ class SessionFeedbackController with ChangeNotifier {
       var feedbacks = <SessionFeedbacks>[];
       var querySnapshot =
           await FirebaseFirestore.instance
-              .collection(Session.colletcionName)
+              .collection(Session.collectionName)
               .doc(sessionId)
-              .collection(SessionFeedbacks.colletcionName)
+              .collection(SessionFeedbacks.collectionName)
               .where('feedbackType', isEqualTo: FeedbackType.self.toString())
               .get();
 
@@ -103,9 +103,9 @@ class SessionFeedbackController with ChangeNotifier {
 
   Stream<QuerySnapshot<Object?>> getSessionFeedbacks({required String sessionId}) {
     return FirebaseFirestore.instance
-        .collection(Session.colletcionName)
+        .collection(Session.collectionName)
         .doc(sessionId)
-        .collection(SessionFeedbacks.colletcionName)
+        .collection(SessionFeedbacks.collectionName)
         .snapshots();
   }
 

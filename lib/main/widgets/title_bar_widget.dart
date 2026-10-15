@@ -36,12 +36,12 @@ class _TitleBarWidgetState extends State<TitleBarWidget> {
           children: [
             TebText(
               'Código de acesso da sessão: ',
-              textSize: Theme.of(context).textTheme.labelLarge!.fontSize,
-              textWeight: FontWeight.w700,
+              fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
+              fontWeight: FontWeight.w700,
             ),
             TebText(
               '(${widget.session.accessCode})',
-              textSize: Theme.of(context).textTheme.labelLarge!.fontSize,
+              fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
               padding: const EdgeInsets.only(left: 3),
             ),
           ],
@@ -70,14 +70,14 @@ class _TitleBarWidgetState extends State<TitleBarWidget> {
           children: [
             TebText(
               widget.mobile ? 'Copiar Link para feedbacks: ' : 'Link para feedbacks: ',
-              textSize: Theme.of(context).textTheme.labelLarge!.fontSize,
-              textWeight: FontWeight.w700,
+              fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
+              fontWeight: FontWeight.w700,
             ),
 
             if (!widget.mobile)
               TebText(
                 widget.session.sessionFeedbackUrl,
-                textSize: Theme.of(context).textTheme.labelLarge!.fontSize,
+                fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
                 padding: const EdgeInsets.only(left: 3),
               ),
           ],
@@ -107,7 +107,7 @@ class _TitleBarWidgetState extends State<TitleBarWidget> {
           children: [
             Padding(padding: const EdgeInsets.only(bottom: 10), child: SiteTitleWidget(mobile: widget.mobile)),
             if (widget.feedbackType == FeedbackType.self)
-              Row(children: [TebText(widget.session.name, textSize: 20, padding: EdgeInsets.only(bottom: 20, left: 10))]),
+              Row(children: [TebText(widget.session.name, fontSize: 20, padding: EdgeInsets.only(bottom: 20, left: 10))]),
             if (widget.feedbackType == FeedbackType.self)
               Row(children: [Padding(padding: const EdgeInsets.only(bottom: 10), child: _sessionCode(context))]),
             if (widget.feedbackType == FeedbackType.self) _feedbackLink(context),
@@ -118,7 +118,7 @@ class _TitleBarWidgetState extends State<TitleBarWidget> {
           children: [
             Padding(padding: const EdgeInsets.only(bottom: 10), child: SiteTitleWidget(mobile: widget.mobile)),
             if (widget.feedbackType == FeedbackType.self)
-              Row(children: [TebText(widget.session.name, textSize: 20, padding: EdgeInsets.only(bottom: 20, left: 10))]),
+              Row(children: [TebText(widget.session.name, fontSize: 20, padding: EdgeInsets.only(bottom: 20, left: 10))]),
 
             //U6UKY4UU
             if (widget.feedbackType == FeedbackType.self)

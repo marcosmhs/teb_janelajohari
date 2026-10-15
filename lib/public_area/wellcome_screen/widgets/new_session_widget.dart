@@ -20,8 +20,8 @@ class NewSessionWidget extends StatelessWidget {
     var textWidget = TebText(
       'Utilize esta opção para criar uma sessão própria, onde <b>você fará sua autoavaliação</b> e depois irá pedir a colegas de seu contribuam com <b>feedbacks utilizando os mesmos atributos</b>.',
       textType: TextType.html,
-      textSize: 20,
-      textColor: Theme.of(context).canvasColor,
+      fontSize: 20,
+      fontColor: Theme.of(context).canvasColor,
     );
 
     return Column(

@@ -2,7 +2,6 @@
 
 // ignore: depend_on_referenced_packages
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:teb_janelajohari/main/widgets/about_jorari_window_area.dart';
 import 'package:teb_janelajohari/main/widgets/contact_area.dart';
@@ -10,9 +9,7 @@ import 'package:teb_janelajohari/main/widgets/how_it_works_area.dart';
 import 'package:teb_janelajohari/main/widgets/site_title_widget.dart';
 import 'package:teb_janelajohari/main/widgets/social_links_area.dart';
 import 'package:teb_janelajohari/public_area/wellcome_screen/widgets/find_session_widget.dart';
-import 'package:teb_janelajohari/public_area/wellcome_screen/widgets/floating_menu_widget.dart';
 import 'package:teb_janelajohari/public_area/wellcome_screen/widgets/new_session_widget.dart';
-import 'package:teb_package/screen_widgets/teb_expandable_fab/teb_expandable_fab.dart';
 import 'package:teb_package/teb_package.dart';
 
 class WellcomeScreen extends StatefulWidget {
@@ -26,7 +23,7 @@ class _WellcomeScreenState extends State<WellcomeScreen> {
   late AutoScrollController _autoScrollController;
   final _scrollDirection = Axis.vertical;
 
-  final _key = GlobalKey<TebExpandableFabState>();
+  
 
   @override
   void initState() {
@@ -54,10 +51,10 @@ class _WellcomeScreenState extends State<WellcomeScreen> {
           child: TebText(
             text,
             textAlign: TextAlign.center,
-            textSize: bold ? 16 : 14,
+            fontSize: bold ? 16 : 14,
             letterSpacing: 2,
-            textColor: Colors.black,
-            textWeight: bold ? FontWeight.bold : FontWeight.normal,
+            fontColor: Colors.black,
+            fontWeight: bold ? FontWeight.bold : FontWeight.normal,
           ),
         ),
       ),

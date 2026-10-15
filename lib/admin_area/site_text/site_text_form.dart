@@ -38,7 +38,7 @@ class _SiteTextFormState extends State<SiteTextForm> {
   }
 
   void _setExperienceToRemove({required SiteText siteText}) {
-    TebCustomDialog(context: context).confirmationDialog(message: 'Excluir este texto?').then((value) {
+    TebDialog(context: context).confirmationDialog(message: 'Excluir este texto?').then((value) {
       if (value == true) {
         if (siteText.id.isEmpty) {
           setState(() => _siteTextList.remove(siteText));
@@ -64,7 +64,7 @@ class _SiteTextFormState extends State<SiteTextForm> {
         retorno = await siteTextController.save(siteTextList: _siteTextList);
 
         if (retorno.returnType == TebReturnType.sucess) {
-          TebMessage.sucess(context, message: 'Dados alterados com sucesso');
+          TebMessage.success(context, message: 'Dados alterados com sucesso');
           Navigator.of(context).pushReplacementNamed(Routes.adminAreaScreen, arguments: {'user': _user});
         }
 
@@ -207,7 +207,6 @@ class _SiteTextFormState extends State<SiteTextForm> {
                     ),
                     Expanded(
                       child: TebCheckBox(
-                        context: context,
                         value: siteText.bold,
                         title: 'Negrito',
                         onChanged: (value) => setState(() => siteText.bold = value ?? false),
@@ -216,7 +215,7 @@ class _SiteTextFormState extends State<SiteTextForm> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                TebText('Padding', textSize: 20, padding: EdgeInsets.only(bottom: 10)),
+                TebText('Padding', fontSize: 20, padding: EdgeInsets.only(bottom: 10)),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -368,7 +367,7 @@ class _SiteTextFormState extends State<SiteTextForm> {
           if (_siteTextList.where((e) => e.status != SiteTextStatus.saved).isEmpty) {
             _changePageFilterDropDownButtonValue(page: value ?? '');
           } else {
-            TebCustomDialog(context: context)
+            TebDialog(context: context)
                 .confirmationDialog(message: 'Mudar o filtro fará com que todas as alterações sejam perdidas, deseja continuar')
                 .then((anser) {
                   if (anser ?? false) _changePageFilterDropDownButtonValue(page: value ?? '');

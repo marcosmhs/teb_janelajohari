@@ -33,7 +33,7 @@ class CarouselWidget extends StatelessWidget {
                     children: [
                       Icon(item['icon'], size: 40, color: Colors.white),
                       const SizedBox(height: 10),
-                      TebText(item['title'], textSize: 24, textWeight: FontWeight.bold, textColor: Theme.of(context).canvasColor),
+                      TebText(item['title'], fontSize: 24, fontWeight: FontWeight.bold, fontColor: Theme.of(context).canvasColor),
                       const SizedBox(height: 8),
                       Padding(padding: const EdgeInsets.only(top: 10), child: Html(data: item['text'])),
                     ],

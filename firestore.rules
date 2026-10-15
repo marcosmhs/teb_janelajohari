@@ -1,0 +1,13 @@
+rules_version = '2';
+
+// ATENÇÃO: regras recuperadas do projeto em 2026-10-15 (Console/REST API).
+// Estas são as regras de "modo de teste" geradas pelo Firebase: liberam
+// leitura e escrita de TODO o banco para QUALQUER pessoa até 2035. Precisam
+// ser substituídas por regras restritas antes de qualquer dado sensível.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.time < timestamp.date(2035, 5, 25);
+    }
+  }
+}

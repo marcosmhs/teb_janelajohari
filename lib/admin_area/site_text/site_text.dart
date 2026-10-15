@@ -5,7 +5,7 @@ import 'package:teb_package/util/teb_util.dart';
 enum SiteTextStatus { created, saved, delete, updated }
 
 class SiteText {
-  static const String colletcionName = 'site_text';
+  static const String collectionName = 'site_text';
 
   late String id;
   late SiteTextStatus status;

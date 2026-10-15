@@ -20,7 +20,7 @@ class AdmAccessLogController with ChangeNotifier {
 
       await FirebaseFirestore.instance.collection(_accessCollectionName).doc(accessLog.id).set(accessLog.toMap());
 
-      return TebReturn.sucess;
+      return TebReturn.success;
     } catch (e) {
       return TebReturn.error(e.toString());
     }

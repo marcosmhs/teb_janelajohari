@@ -59,28 +59,81 @@ class Session {
     'Tendência à Rigidez / Inflexibilidade', // Similar a teimosia, foca na resistência à mudança.
   ];
 
-  static const String colletcionName = 'session';
+  static const String collectionName = 'session';
 
-  late String id;
-  late String name;
-  late String encryptedAccessCode;
-  late String feedbackCode;
-  late DateTime? createDate;
-  late List<String> positiveAdjectives = [];
-  late List<String> constructiveAdjectives = [];
+  String id;
+  String name;
+  String feedbackCode;
+  DateTime? createDate;
+  List<String> positiveAdjectives = [];
+  List<String> constructiveAdjectives = [];
+
+  /// Código de acesso em texto puro, mantido apenas em memória.
+  /// No Firestore ele nunca é gravado em claro — apenas sua versão cifrada
+  /// (ver [encryptedAccessCode]).
+  String _accessCode = '';
 
   Session({
     this.id = '',
     this.name = '',
-    this.encryptedAccessCode = '',
+    String accessCode = '',
     this.feedbackCode = '',
     this.createDate,
     List<String>? positiveAdjectives,
     List<String>? constructiveAdjectives,
   }) {
+    _accessCode = accessCode.trim();
     createDate ??= DateTime.now();
     this.positiveAdjectives = positiveAdjectives ?? [...basePositiveAdjectives];
     this.constructiveAdjectives = constructiveAdjectives ?? [...baseConstructiveAdjectives];
+  }
+
+  static final TebAesEncrypt _aes = TebAesEncrypt(
+    ivKey: Consts.textEncriptStaticKey,
+    // Necessário apenas para ler dados no formato antigo (ver _decryptAccessCode).
+    fixedIvKey: Consts.textEncriptStaticKey,
+  );
+
+  /// Código de acesso em texto puro, pronto para exibição.
+  String get accessCode => _accessCode.toUpperCase();
+  set accessCode(String value) => _accessCode = value.trim();
+
+  /// Valor cifrado (AES-CTR com IV aleatório) gravado no Firestore apenas para
+  /// permitir exibir o código de volta. Muda a cada gravação, então NÃO serve
+  /// para consultas — use [accessCodeHash] para isso.
+  String get encryptedAccessCode => _accessCode.isEmpty ? '' : _aes.aesEncryp(text: _accessCode);
+
+  /// Índice determinístico (HMAC-SHA256) usado para PESQUISAR a sessão pelo
+  /// código. Não é reversível. É case-insensitive.
+  String get accessCodeHash => accessCodeHashOf(_accessCode);
+
+  /// Gera o mesmo [accessCodeHash] a partir de um código em texto puro — use ao
+  /// montar a consulta por código de acesso.
+  static String accessCodeHashOf(String plainText) {
+    final code = plainText.trim();
+    return code.isEmpty ? '' : _aes.searchableHash(text: code);
+  }
+
+  /// Valor cifrado no formato ANTIGO (determinístico, IV fixo). Serve apenas
+  /// para localizar sessões ainda não migradas; novas gravações usam o formato
+  /// aleatório + [accessCodeHash].
+  static String legacyEncryptedAccessCodeOf(String plainText) {
+    final code = plainText.trim();
+    // ignore: deprecated_member_use
+    return code.isEmpty ? '' : _aes.encryp(text: code);
+  }
+
+  static String _decryptAccessCode(String storedValue) {
+    if (storedValue.isEmpty) return '';
+    // Formato novo (aesEncryp) é "iv:cipher"; o antigo (encryp) é base64 puro,
+    // sem ':'. Base64 nunca contém ':', então o separador distingue os dois.
+    if (storedValue.contains(':')) {
+      final result = _aes.aesDecrypt(encryptedText: storedValue);
+      return (result['decryptedText'] ?? '').toString();
+    }
+    // ignore: deprecated_member_use
+    final result = _aes.decrypt(encryptedText: storedValue);
+    return (result['decryptedText'] ?? '').toString();
   }
 
   factory Session.fromDocument(DocumentSnapshot doc) {
@@ -88,27 +141,16 @@ class Session {
     return Session.fromMap(data);
   }
 
-  String get accessCode {
-    var decryptRetutn = TebAesEncrypt(
-      ivKey: Consts.textEncriptStaticKey,
-      fixedIvKey: Consts.textEncriptStaticKey,
-    ).decrypt(encryptedText: encryptedAccessCode);
-    return decryptRetutn['decryptedText'].toString().toUpperCase();
-  }
-
   static Session fromMap(Map<String, dynamic> map) {
-    var session = Session();
+    final encrypted = (map['encryptedAccessCode'] ?? '').toString();
+    // Compatibilidade: sessões antigas podem ter sido gravadas com o código em
+    // texto puro no campo 'accessCode'.
+    final accessCode = encrypted.isNotEmpty ? _decryptAccessCode(encrypted) : (map['accessCode'] ?? '').toString();
 
-    session = Session(
+    final session = Session(
       id: map['id'] ?? '',
       name: map['name'] ?? '',
-      encryptedAccessCode:
-          (map['encryptedAccessCode'] ?? '').isEmpty
-              ? TebAesEncrypt(
-                ivKey: Consts.textEncriptStaticKey,
-                fixedIvKey: Consts.textEncriptStaticKey,
-              ).encryp(text: map['accessCode'] ?? '')
-              : map['encryptedAccessCode'] ?? '',
+      accessCode: accessCode,
       feedbackCode: map['feedbackCode'] ?? '',
       createDate: map['createDate'] == null ? null : DateTime.tryParse(map['createDate']),
       positiveAdjectives:
@@ -119,33 +161,22 @@ class Session {
               : [],
     );
 
-    if (session.positiveAdjectives.isNotEmpty) {
-      session.positiveAdjectives = session.positiveAdjectives.toSet().toList();
-    }
-    if (session.constructiveAdjectives.isNotEmpty) {
-      session.constructiveAdjectives = session.constructiveAdjectives.toSet().toList();
-    }
+    session.positiveAdjectives = session.positiveAdjectives.toSet().toList();
+    session.constructiveAdjectives = session.constructiveAdjectives.toSet().toList();
 
     return session;
   }
 
-  String get sessionFeedbackUrl {
-    //return 'http://localhost:1234?session_feedback_code=$feedbackCode';
-    return 'https://teb-janelajohari.web.app?session_feedback_code=$feedbackCode';
-  }
+  String get sessionFeedbackUrl => 'https://teb-janelajohari.web.app?session_feedback_code=$feedbackCode';
 
-  Map<String, dynamic> get toMap {
-    Map<String, dynamic> r = {};
-    r = {
-      'id': id,
-      'name': name,
-      'encryptedAccessCode': encryptedAccessCode,
-      'feedbackCode': feedbackCode,
-      'createDate': createDate?.toString(),
-      'positiveAdjectives': positiveAdjectives,
-      'constructiveAdjectives': constructiveAdjectives,
-    };
-
-    return r;
-  }
+  Map<String, dynamic> get toMap => {
+    'id': id,
+    'name': name,
+    'encryptedAccessCode': encryptedAccessCode,
+    'accessCodeHash': accessCodeHash,
+    'feedbackCode': feedbackCode,
+    'createDate': createDate?.toString(),
+    'positiveAdjectives': positiveAdjectives,
+    'constructiveAdjectives': constructiveAdjectives,
+  };
 }

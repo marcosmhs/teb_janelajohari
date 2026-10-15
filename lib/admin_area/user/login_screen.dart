@@ -7,7 +7,8 @@ import 'package:teb_janelajohari/admin_area/user/user_controller.dart';
 import 'package:teb_janelajohari/routes.dart';
 import 'package:teb_package/control_widgets/teb_text.dart';
 import 'package:teb_package/control_widgets/teb_text_edit.dart';
-import 'package:teb_package/messaging/teb_custom_dialog.dart';
+import 'package:teb_package/messaging/teb_message.dart';
+
 import 'package:teb_package/screen_widgets/teb_scaffold.dart';
 import 'package:teb_package/util/teb_return.dart';
 import 'package:teb_package/util/teb_util.dart';
@@ -49,11 +50,14 @@ class _LoginScreenState extends State<LoginScreen> {
         user.setPassword(TebUtil.encrypt(_password));
         retorno = await userController.login(user: user);
         if (retorno.returnType == TebReturnType.sucess) {
-          Navigator.of(context).pushReplacementNamed(Routes.adminAreaScreen, arguments: {'user': userController.currentUser});
+          Navigator.of(context).pushReplacementNamed(
+            Routes.adminAreaScreen,
+            arguments: {'user': userController.currentUser},
+          );
         }
         // se houve um erro no login ou no cadastro exibe o erro
         if (retorno.returnType == TebReturnType.error) {
-          TebCustomDialog(context: context).errorMessage(message: retorno.message);
+          TebMessage.error(context, message: retorno.message);
         }
       } finally {
         setState(() => _isLoading = false);
@@ -82,30 +86,33 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image(height: 100, fit: BoxFit.cover, image: const AssetImage('assets/images/logo.png')),
+                Image(
+                  height: 100,
+                  fit: BoxFit.cover,
+                  image: const AssetImage('assets/images/logo.png'),
+                ),
                 TebText(
                   'Janela de Johari',
-                  textColor: Theme.of(context).colorScheme.secondary,
-                  textSize: 30,
+                  fontColor: Theme.of(context).colorScheme.secondary,
+                  fontSize: 30,
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   letterSpacing: 4,
-                  textWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w600,
                 ),
                 TebText(
                   'Marcos Silva',
-                  textColor: Theme.of(context).colorScheme.secondary,
-                  textSize: 20,
+                  fontColor: Theme.of(context).colorScheme.secondary,
+                  fontSize: 20,
                   letterSpacing: 4,
-                  textWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w600,
                 ),
                 TebText(
                   'Ambiente Administrativo',
-                  textSize: 14,
+                  fontSize: 14,
                   letterSpacing: 2,
                   padding: const EdgeInsets.symmetric(vertical: 10),
                 ),
                 TebTextEdit(
-                  context: context,
                   controller: _emailController,
                   labelText: 'E-mail',
                   hintText: 'Informe seu e-mail',
@@ -115,12 +122,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   validator: (value) {
                     final finalValue = value ?? '';
                     if (finalValue.trim().isEmpty) return 'Informe o e-mail';
-                    if (!finalValue.contains('@') || !finalValue.contains('.')) return 'Informe um e-mail válido';
+                    if (!finalValue.contains('@') || !finalValue.contains('.')) {
+                      return 'Informe um e-mail válido';
+                    }
                     return null;
                   },
                 ),
                 TebTextEdit(
-                  context: context,
                   controller: _passwordController,
                   labelText: 'Senha',
                   hintText: 'Informe sua senha',
@@ -132,7 +140,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   validator: (value) {
                     final finalValue = value ?? '';
                     if (finalValue.trim().isEmpty) return 'Informe a senha';
-                    if (finalValue.trim().length < 6) return 'Senha deve possuir 6 ou mais caracteres';
+                    if (finalValue.trim().length < 6) {
+                      return 'Senha deve possuir 6 ou mais caracteres';
+                    }
                     return null;
                   },
                 ),
@@ -145,7 +155,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         // criar nova conta
                         OutlinedButton(
                           onPressed: () => Navigator.of(context).pop(),
-                          style: ButtonStyle(foregroundColor: WidgetStateProperty.all(Theme.of(context).disabledColor)),
+                          style: ButtonStyle(
+                            foregroundColor: WidgetStateProperty.all(
+                              Theme.of(context).disabledColor,
+                            ),
+                          ),
                           child: const Text('Voltar'),
                         ),
                         const SizedBox(width: 20),
@@ -155,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                 TebText(
                   "v${_info.version}.${_info.buildNumber}",
-                  textSize: 10,
+                  fontSize: 10,
 
                   letterSpacing: 2,
                   padding: const EdgeInsets.symmetric(vertical: 15),

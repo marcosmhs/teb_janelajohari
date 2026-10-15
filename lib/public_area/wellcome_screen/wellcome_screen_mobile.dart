@@ -10,8 +10,9 @@ import 'package:teb_janelajohari/main/widgets/how_it_works_area.dart';
 import 'package:teb_janelajohari/main/widgets/site_title_widget.dart';
 import 'package:teb_janelajohari/public_area/wellcome_screen/widgets/find_session_widget.dart';
 import 'package:teb_janelajohari/public_area/wellcome_screen/widgets/new_session_widget.dart';
+import 'package:teb_package/control_widgets/teb_buttons_line.dart';
 import 'package:teb_package/screen_widgets/teb_expandable_fab/teb_expandable_fab.dart';
-import 'package:teb_package/teb_package.dart';
+import 'package:teb_package/screen_widgets/teb_scaffold.dart';
 
 class WellcomeScreenMobile extends StatefulWidget {
   const WellcomeScreenMobile({super.key});

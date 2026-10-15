@@ -16,7 +16,7 @@ class SiteTitleWidget extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 10),
             child: Image.asset('assets/images/logo.png', fit: BoxFit.fitHeight, height: mobile ? 30 : 45),
           ),
-          TebText('Janela de Johari', textSize: mobile ? 38 : 48),
+          TebText('Janela de Johari', fontSize: mobile ? 38 : 48),
         ],
       ),
     );

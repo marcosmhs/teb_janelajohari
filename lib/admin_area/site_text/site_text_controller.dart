@@ -80,8 +80,8 @@ class SiteTextController with ChangeNotifier {
     var siteText = _siteTextList.singleWhere((s) => s.local == local, orElse: () => SiteText());
     return TebText(
       siteText.id.isNotEmpty ? siteText.text : defaultText,
-      textSize: siteText.id.isNotEmpty ? siteText.size : defaultSize,
-      textWeight: siteText.id.isNotEmpty ? siteText.fontWeight : null,
+      fontSize: siteText.id.isNotEmpty ? siteText.size : defaultSize,
+      fontWeight: siteText.id.isNotEmpty ? siteText.fontWeight : null,
       padding: EdgeInsets.only(
         left: siteText.paddingLeft,
         right: siteText.paddingRight,
@@ -92,7 +92,7 @@ class SiteTextController with ChangeNotifier {
   }
 
   static Future<List<String>> getSiteTextPageList() async {
-    var dataRef = await FirebaseFirestore.instance.collection(SiteText.colletcionName).get();
+    var dataRef = await FirebaseFirestore.instance.collection(SiteText.collectionName).get();
 
     final dataList = dataRef.docs.map((doc) => doc.data()).toList();
 
@@ -113,8 +113,8 @@ class SiteTextController with ChangeNotifier {
   static Future<List<SiteText>> getSiteTextFromPage({String page = ''}) async {
     var dataRef =
         page.isNotEmpty
-            ? await FirebaseFirestore.instance.collection(SiteText.colletcionName).where("page", isEqualTo: page).get()
-            : await FirebaseFirestore.instance.collection(SiteText.colletcionName).get();
+            ? await FirebaseFirestore.instance.collection(SiteText.collectionName).where("page", isEqualTo: page).get()
+            : await FirebaseFirestore.instance.collection(SiteText.collectionName).get();
 
     final dataList = dataRef.docs.map((doc) => doc.data()).toList();
 
@@ -129,7 +129,7 @@ class SiteTextController with ChangeNotifier {
   }
 
   static Future<String> get getSiteTextStringList async {
-    var dataRef = await FirebaseFirestore.instance.collection(SiteText.colletcionName).get();
+    var dataRef = await FirebaseFirestore.instance.collection(SiteText.collectionName).get();
 
     final dataList = dataRef.docs.map((doc) => doc.data()).toList();
 
@@ -159,15 +159,15 @@ class SiteTextController with ChangeNotifier {
     try {
       for (var siteText in siteTextList) {
         if (siteText.status == SiteTextStatus.delete) {
-          await FirebaseFirestore.instance.collection(SiteText.colletcionName).doc(siteText.id).delete();
+          await FirebaseFirestore.instance.collection(SiteText.collectionName).doc(siteText.id).delete();
         } else {
           if (siteText.id.isEmpty) siteText.id = TebUidGenerator.firestoreUid;
 
-          await FirebaseFirestore.instance.collection(SiteText.colletcionName).doc(siteText.id).set(siteText.toMap);
+          await FirebaseFirestore.instance.collection(SiteText.collectionName).doc(siteText.id).set(siteText.toMap);
         }
       }
 
-      return TebReturn.sucess;
+      return TebReturn.success;
     } catch (e) {
       return TebReturn.error(e.toString());
     }

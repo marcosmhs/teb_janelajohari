@@ -15,10 +15,10 @@ class CarouselTextController with ChangeNotifier {
         carouselText.id = TebUidGenerator.firestoreUid;
       }
       
-      await FirebaseFirestore.instance.collection(CarouselText.colletcionName).doc(carouselText.id).set(carouselText.toMap);
+      await FirebaseFirestore.instance.collection(CarouselText.collectionName).doc(carouselText.id).set(carouselText.toMap);
 
       notifyListeners();
-      return TebReturn.sucess;
+      return TebReturn.success;
     } catch (e) {
       return TebReturn.error(e.toString());
     }
@@ -29,7 +29,7 @@ class CarouselTextController with ChangeNotifier {
 
     var dataRef =
         await FirebaseFirestore.instance
-            .collection(CarouselText.colletcionName)
+            .collection(CarouselText.collectionName)
             .where("area", isEqualTo: area)
             .where("local", isEqualTo: local)
             .get();
@@ -45,10 +45,10 @@ class CarouselTextController with ChangeNotifier {
 
   Future<TebReturn> delete({required CarouselText carouselText}) async {
     try {
-      await FirebaseFirestore.instance.collection(CarouselText.colletcionName).doc(carouselText.id).delete();
+      await FirebaseFirestore.instance.collection(CarouselText.collectionName).doc(carouselText.id).delete();
 
       notifyListeners();
-      return TebReturn.sucess;
+      return TebReturn.success;
     } catch (e) {
       return TebReturn.error(e.toString());
     }

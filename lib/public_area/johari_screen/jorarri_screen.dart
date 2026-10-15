@@ -60,20 +60,20 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
                         if (_mobile) const SizedBox(height: 20),
                         TebText(
                           'Lembre-se de salvar os dados de acesso e convite para feedback',
-                          textSize: 24,
+                          fontSize: 24,
                           textType: TextType.html,
-                          textWeight: FontWeight.bold,
+                          fontWeight: FontWeight.bold,
                           padding: const EdgeInsets.only(bottom: 10),
                         ),
                         TebText(
                           'Seu código de acesso (<b>${_session.accessCode}</b>) será necessário para acessar seus feedbacks posteriormente',
-                          textSize: 16,
+                          fontSize: 16,
                           textType: TextType.html,
                           padding: const EdgeInsets.only(bottom: 10),
                         ),
                         TebText(
                           'Guarde-o em um lugar de fácil acesso para que possa usá-lo novamente no futuro :)',
-                          textSize: 16,
+                          fontSize: 16,
                           textType: TextType.html,
                           padding: const EdgeInsets.only(bottom: 10),
                         ),
@@ -82,12 +82,12 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
                           onPressed: () {
                             Clipboard.setData(ClipboardData(text: _session.accessCode));
                             Navigator.of(ctx).pop(true);
-                            TebMessage.sucess(context, message: 'Código de acesso copiado para sua área de transferência!');
+                            TebMessage.success(context, message: 'Código de acesso copiado para sua área de transferência!');
                           },
                           size: Size(_mobile ? 350 : 450, 90),
                           child: TebText(
                             'Clique aqui para copiar seu <b>código de acesso</b> para a área de transferência e deixar sua sessão',
-                            textSize: 16,
+                            fontSize: 16,
                             textAlign: _mobile ? TextAlign.center : null,
                             textType: TextType.html,
                           ),
@@ -118,9 +118,9 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        TebText(title, textSize: 24, textWeight: FontWeight.bold),
+        TebText(title, fontSize: 24, fontWeight: FontWeight.bold),
 
-        if (subtitle != null) TebText(subtitle, textSize: 16),
+        if (subtitle != null) TebText(subtitle, fontSize: 16),
         Padding(
           padding: EdgeInsets.symmetric(vertical: 8),
           child: Wrap(
@@ -161,7 +161,7 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
         TebButton(
           onPressed: () => setState(() => _showOthersFeedbackOrderedByAdjectiveName = true),
           buttonType: TebButtonType.outlinedButton,
-          child: TebText('Adjetivo', textWeight: _showOthersFeedbackOrderedByAdjectiveName ? FontWeight.bold : FontWeight.normal),
+          child: TebText('Adjetivo', fontWeight: _showOthersFeedbackOrderedByAdjectiveName ? FontWeight.bold : FontWeight.normal),
         ),
         const SizedBox(width: 10),
         TebButton(
@@ -169,14 +169,14 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
           buttonType: TebButtonType.outlinedButton,
           child: TebText(
             'Quantidade de feedbacks',
-            textWeight: _showOthersFeedbackOrderedByAdjectiveName ? FontWeight.normal : FontWeight.bold,
+            fontWeight: _showOthersFeedbackOrderedByAdjectiveName ? FontWeight.normal : FontWeight.bold,
           ),
         ),
       ],
     );
     var titleWidget = Row(
       children: [
-        TebText(title, textSize: 30, textWeight: FontWeight.bold),
+        TebText(title, fontSize: 30, fontWeight: FontWeight.bold),
 
         if (selfFeedbackArea)
           TebButton(
@@ -224,7 +224,7 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
                     child: Row(
                       children: [
                         if (icon != null) Padding(padding: const EdgeInsets.only(right: 20), child: Icon(icon, size: 30)),
-                        Expanded(child: TebText(subtitle, textType: TextType.html, textSize: 20)),
+                        Expanded(child: TebText(subtitle, textType: TextType.html, fontSize: 20)),
                       ],
                     ),
                   ),
@@ -233,7 +233,7 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
                     othersFeedbackCount == 0
                         ? 'Até agora você não recebeu feedbacks, envie seu link de feedback para seus colegas e peça para eles responderem a pesquisa.'
                         : 'Até agora você recebeu $othersFeedbackCount feedbacks',
-                    textSize: 16,
+                    fontSize: 16,
                     padding: EdgeInsets.symmetric(vertical: 8),
                   ),
                 if ((positiveAdjectives ?? []).isNotEmpty)
@@ -254,8 +254,8 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
                 if ((othersComments ?? []).isNotEmpty)
                   TebText(
                     'Abaixo está uma lista de comentários deixado pelas pessoas que contribuiram com seu feedback',
-                    textSize: 20,
-                    textWeight: FontWeight.bold,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                     padding: const EdgeInsets.only(top: 18, bottom: 10),
                   ),
 
@@ -273,8 +273,8 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
                                 Expanded(
                                   child: TebText(
                                     comment,
-                                    textSize: 16,
-                                    textWeight: FontWeight.w400,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
                                     padding: EdgeInsets.only(left: 10),
                                   ),
                                 ),
@@ -385,7 +385,7 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
                   ),
                 ],
               ),
-      subtitle: subtitle == null ? null : TebText(subtitle, textSize: 20),
+      subtitle: subtitle == null ? null : TebText(subtitle, fontSize: 20),
       controller: controller,
       children: [children],
     );
@@ -584,7 +584,7 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
                           label: 'Copiar texto',
                           onPressed: () {
                             Clipboard.setData(ClipboardData(text: _getIAText(feedbacks)));
-                            TebMessage.sucess(context, message: 'Texto copiado para sua área de transferência!');
+                            TebMessage.success(context, message: 'Texto copiado para sua área de transferência!');
                           },
                         ),
                       ],
