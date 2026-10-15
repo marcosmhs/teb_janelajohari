@@ -28,7 +28,7 @@ class SessionFeedbacks {
   /// Um laranja suave pode trazer calor, energia e um ponto de foco amigável.
   static const Color othersFeedbackAreaColor = Color.fromARGB(252, 214, 130, 253); // Laranja (Material Orange 300)
 
-  static const String colletcionName = 'session_feedbacks';
+  static const String collectionName = 'session_feedbacks';
 
   late String sessionId;
   late String id;

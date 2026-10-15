@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:teb_janelajohari/local_data_controller.dart';
 import 'package:teb_janelajohari/main/widgets/area_title_widget.dart';
@@ -27,33 +25,36 @@ class _FindSessionWidgetState extends State<FindSessionWidget> {
   final TextEditingController _sessionAccessCodeController = TextEditingController();
 
   Future<void> _submit() async {
-    if (!(formKey.currentState?.validate() ?? true)) {
-      _sendingData = false;
-    } else {
-      if (_sendingData) return;
-      _sendingData = true;
-      try {
-        if (_sessionAccessCodeController.text.isEmpty) {
-          TebMessage.error(context, message: 'Ops, você não informou o código de acesso da sessão');
-          return;
-        }
+    if (_sendingData) return;
+    if (!(formKey.currentState?.validate() ?? false)) return;
 
-        var sessionController = SessionController();
+    if (_sessionAccessCodeController.text.trim().isEmpty) {
+      TebMessage.error(context, message: 'Ops, você não informou o código de acesso da sessão');
+      return;
+    }
 
-        var customReturn = await sessionController.getCurrentSessionByAccessCode(accessCode: _sessionAccessCodeController.text);
+    setState(() => _sendingData = true);
+    try {
+      final sessionController = SessionController();
+      final customReturn = await sessionController.getCurrentSessionByAccessCode(
+        accessCode: _sessionAccessCodeController.text,
+      );
 
-        if (customReturn.returnType == TebReturnType.error) {
-          TebMessage.error(context, message: customReturn.message);
-          return;
-        }
-        LocalDataController().saveSession(session: sessionController.currentSession);
+      if (!mounted) return;
 
-        Navigator.of(
-          context,
-        ).popAndPushNamed(Routes.johariScreen, arguments: {'session': sessionController.currentSession, 'mobile': widget.mobile});
-      } finally {
-        _sendingData = false;
+      if (customReturn.returnType == TebReturnType.error) {
+        TebMessage.error(context, message: customReturn.message);
+        return;
       }
+
+      LocalDataController().saveSession(session: sessionController.currentSession);
+
+      Navigator.of(context).popAndPushNamed(
+        Routes.johariScreen,
+        arguments: {'session': sessionController.currentSession, 'mobile': widget.mobile},
+      );
+    } finally {
+      if (mounted) setState(() => _sendingData = false);
     }
   }
 
@@ -65,32 +66,36 @@ class _FindSessionWidgetState extends State<FindSessionWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TebText(
-            'Informe abaixo o código do convite <br> para a sessão individual',
+            'Informe abaixo o código de acesso<br>para sua sessão',
             textType: TextType.html,
-            textSize: 16,
-            textColor: Theme.of(context).canvasColor,
+            fontSize: 16,
+            fontColor: Theme.of(context).canvasColor,
           ),
 
           ConstrainedBox(
             constraints: BoxConstraints.tightFor(height: 72, width: 250),
             child: TebTextEdit(
-              context: context,
-              labelText: 'Código do convite para a sessão',
+              labelText: 'Código de acesso',
               fillColor: Theme.of(context).canvasColor,
               controller: _sessionAccessCodeController,
               textInputAction: TextInputAction.send,
             ),
           ),
-          TebButton(label: 'Entrar', textStyle: TextStyle(color: Theme.of(context).canvasColor), onPressed: () => _submit()),
+          _sendingData
+              ? Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: CircularProgressIndicator(color: Theme.of(context).canvasColor),
+              )
+              : TebButton(label: 'Entrar', textStyle: TextStyle(color: Theme.of(context).canvasColor), onPressed: _submit),
         ],
       ),
     );
 
     var textWidget = TebText(
-      'Utilize a opção ao lado para entrar em uma sessão de feedback de um colega e <b>dar seu feedback</b>',
+      'Utilize a opção ao lado para entrar em sua sessão de feedback',
       textType: TextType.html,
-      textSize: 20,
-      textColor: Theme.of(context).canvasColor,
+      fontSize: 20,
+      fontColor: Theme.of(context).canvasColor,
     );
     return Column(
       children: [

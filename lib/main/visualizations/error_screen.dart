@@ -19,7 +19,7 @@ class ErrorScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const TebText('Ops, parece que houve um erro', textSize: 20, textWeight: FontWeight.bold, textColor: Colors.red),
+            const TebText('Ops, parece que houve um erro', fontSize: 20, fontWeight: FontWeight.bold, fontColor: Colors.red),
             const SizedBox(height: 20),
             Text(finalMessage, textAlign: TextAlign.center, style: const TextStyle(fontSize: 20)),
             TebButton(

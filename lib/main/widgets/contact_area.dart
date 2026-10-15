@@ -53,9 +53,9 @@ class _ContactAreaState extends State<ContactArea> {
                   child: TebText(
                     "Envie um e-mail para \n marcosmhs@live.com",
                     textAlign: TextAlign.center,
-                    textSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
+                    fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
                     letterSpacing: 3,
-                    textColor: Theme.of(context).cardColor,
+                    fontColor: Theme.of(context).cardColor,
                   ),
                 ),
               ),
@@ -74,17 +74,17 @@ class _ContactAreaState extends State<ContactArea> {
           children: [
             TebText(
               "Desenvolvido por Marcos H. Silva\n${DateTime.now().year}",
-              textSize: 15.0,
+              fontSize: 15.0,
               letterSpacing: 3.0,
-              textWeight: FontWeight.w200,
+              fontWeight: FontWeight.w200,
               textAlign: TextAlign.center,
               padding: EdgeInsets.only(bottom: 10),
             ),
             TebText(
               "v${_info.version}.${_info.buildNumber}",
-              textSize: 10.0,
+              fontSize: 10.0,
               letterSpacing: 3.0,
-              textWeight: FontWeight.w200,
+              fontWeight: FontWeight.w200,
               textAlign: TextAlign.center,
               padding: EdgeInsets.only(bottom: 30),
             ),

@@ -51,9 +51,9 @@ class _PodcastAreaState extends State<PodcastArea> {
             Expanded(
               child: TebText(
                 'Podcast',
-                textColor: Colors.yellowAccent.shade700,
-                textSize: 24,
-                textWeight: FontWeight.bold,
+                fontColor: Colors.yellowAccent.shade700,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
                 padding: EdgeInsets.only(left: 20),
                 textType: TextType.html,
               ),
@@ -62,11 +62,12 @@ class _PodcastAreaState extends State<PodcastArea> {
         ),
         TebText(
           '<b>Ouça um podcast*</b> sobre a Janela de Johari que explica seu conceito, como funciona e o benefícios de se aplicar em seu time',
-          textSize: 20,
-          textWeight: FontWeight.normal,
+          fontSize: 20,
+          fontWeight: FontWeight.normal,
           textType: TextType.html,
           padding: EdgeInsets.only(bottom: 10),
         ),
+        if (!_podcastLoaded) TebText('Carregando...'),
         if (_podcastLoaded)
           StreamBuilder<Duration?>(
             stream: _audioPlayer.durationStream,
@@ -143,8 +144,8 @@ class _PodcastAreaState extends State<PodcastArea> {
           ),
         TebText(
           '* criado utilizando inteligência artificial',
-          textSize: 12,
-          textWeight: FontWeight.normal,
+          fontSize: 12,
+          fontWeight: FontWeight.normal,
           textType: TextType.html,
         ),
       ],

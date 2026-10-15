@@ -2,10 +2,10 @@ name: teb_janelajohari
 description: Janela de Johari.
 publish_to: 'none'
 
-version: 1.1.8+493
+version: 1.1.9+495
 
 environment:
-  sdk: ^3.7.2
+  sdk: ^3.8.1
 
 
 dependencies:
@@ -22,10 +22,10 @@ dependencies:
   intl: ^0.20.2
   flutter_localization: ^0.1.13
   
-  cloud_firestore: ^5.0.1
-  firebase_auth: ^5.0.1
-  firebase_database: ^11.0.1
-  firebase_analytics: ^11.0.1
+  cloud_firestore: ^6.0.2
+  firebase_auth: ^6.1.0
+  firebase_database: ^12.0.0
+  firebase_analytics: ^12.0.0
   
   url_launcher: ^6.1.14
   http: ^1.2.1
@@ -34,6 +34,9 @@ dependencies:
   font_awesome_flutter: ^10.8.0
   flutter_colorpicker: ^1.1.0
   diacritic: ^0.1.6
+  # 9.0.3 passou a usar AppBarThemeData/InputDecorationThemeData (Flutter 3.35+);
+  # travado na linha 9.0.x compatível com o Flutter 3.32 deste projeto.
+  json_theme: ">=9.0.1 <9.0.3"
 
   just_audio: ^0.10.4
   audio_video_progress_bar: ^2.0.3
@@ -41,8 +44,7 @@ dependencies:
   shared_preferences: ^2.2.2
 
   flutter_lints: ^5.0.0
-  firebase_data_connect: ^0.1.4
-  firebase_core: ^3.13.0
+  firebase_core: ^4.0.0
   flutter_html: ^3.0.0
 
 flutter:

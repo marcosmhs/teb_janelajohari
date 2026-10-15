@@ -23,7 +23,8 @@ class LocalDataController with ChangeNotifier {
   }
 
   void saveSession({required Session session}) {
-    clearSessionData();
+    // saveMap substitui todo o conteúdo da chave, então não é preciso remover
+    // antes (evita a corrida entre remover e gravar a mesma chave).
     TebLocalStorage.saveMap(key: 'session', map: session.toMap);
   }
 
@@ -31,7 +32,7 @@ class LocalDataController with ChangeNotifier {
     TebLocalStorage.addItemToList(key: 'othersSessionFeedbackIdList', itemKey: feedbackCode, itemValue: sessionFeedbackId);
   }
 
-  void clearSessionData() async {
+  void clearSessionData() {
     TebLocalStorage.removeValue(key: 'session');
   }
 }

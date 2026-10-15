@@ -49,7 +49,7 @@ class _UserFormState extends State<UserForm> {
       try {
         retorno = await userController.save(user: _user);
         if (retorno.returnType == TebReturnType.sucess) {
-          TebMessage.sucess(context, message: 'Dados Alterado com sucesso');
+          TebMessage.success(context, message: 'Dados Alterado com sucesso');
           Navigator.of(context).pushReplacementNamed(Routes.adminAreaScreen, arguments: {'user': _user});
         }
 
@@ -92,7 +92,6 @@ class _UserFormState extends State<UserForm> {
               children: [
                 // name
                 TebTextEdit(
-                  context: context,
                   controller: _nameController,
                   labelText: 'Nome',
                   hintText: 'Informe seu nome',
@@ -109,7 +108,6 @@ class _UserFormState extends State<UserForm> {
                 ),
                 // registration
                 TebTextEdit(
-                  context: context,
                   controller: _emailController,
                   labelText: 'Email',
                   hintText: 'Seu e-mail',
@@ -127,7 +125,6 @@ class _UserFormState extends State<UserForm> {
                 ),
                 // password
                 TebTextEdit(
-                  context: context,
                   controller: _passwordController,
                   labelText: 'Senha',
                   hintText: 'Informe sua senha',
@@ -155,7 +152,6 @@ class _UserFormState extends State<UserForm> {
                 ),
                 // password confirmation
                 TebTextEdit(
-                  context: context,
                   controller: _confirmPasswordController,
                   labelText: 'Repita a senha',
                   hintText: 'Informe sua senha novamente',

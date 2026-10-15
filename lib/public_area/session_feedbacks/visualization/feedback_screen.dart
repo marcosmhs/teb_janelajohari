@@ -124,8 +124,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       children: [
         TebText(
           title,
-          textSize: Theme.of(context).textTheme.titleLarge!.fontSize,
-          textWeight: FontWeight.bold,
+          fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
+          fontWeight: FontWeight.bold,
           padding: const EdgeInsets.only(top: 18),
         ),
         Padding(
@@ -180,11 +180,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
     retorno = await sessionVotesController.save(sessionFeedbacks: _sessionFeedbacks, session: _session);
 
-    if (retorno != TebReturn.sucess) {
+    if (retorno != TebReturn.success) {
       TebMessage.error(context, message: retorno.message);
     }
 
-    TebMessage.sucess(
+    TebMessage.success(
       context,
       message:
           _sessionFeedbacks.feedbackType == FeedbackType.self
@@ -194,7 +194,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     if (_sessionFeedbacks.feedbackType == FeedbackType.self) {
       LocalDataController().saveSession(session: _session);
       Navigator.of(context).popAndPushNamed(Routes.landingScreen);
-      TebMessage.sucess(
+      TebMessage.success(
         context,
         message:
             'Reflexão individual salva com sucesso!, agora compartilhe o link de avaliação com as pessoas que podem contribuir com seu desenvolvimento',
@@ -278,20 +278,20 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   ? 'Selecione de 5 a 10 adjetivos da lista abaixo que acredita melhor descrevem <b>VOCÊ</b> no contexto do trabalho em equipe no contexto do trabalho em equipe'
                   : 'Selecione de 5 a 10 adjetivos da lista abaixo que acredita melhor descrevem <b>${_session.name}</b> no contexto do trabalho em equipe no contexto do trabalho em equipe',
               textType: TextType.html,
-              textSize: 24,
+              fontSize: 24,
               padding: const EdgeInsets.only(bottom: 10),
             ),
 
             if (_hasOthersFeedback)
               TebText(
                 '* Você já recebeu ao menos um feedback de outras pessoas e por isso não é possível adicionar novos adjetivos',
-                textSize: 16,
+                fontSize: 16,
                 padding: EdgeInsets.only(bottom: 10),
               ),
             if (!_hasOthersFeedback)
               TebText(
                 '* Você também pode adicionar outros adjetivos para que seu time possa utilizá-los seu seus feedbacks',
-                textSize: 16,
+                fontSize: 16,
                 padding: EdgeInsets.only(bottom: 10),
               ),
 
@@ -347,13 +347,12 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             if (_sessionFeedbacks.feedbackType == FeedbackType.others)
               TebText(
                 'Caso queira deixar algum comentário para esta pessoa, use o espaço abaixo',
-                textSize: 18,
+                fontSize: 18,
                 padding: const EdgeInsets.only(top: 20),
               ),
 
             if (_sessionFeedbacks.feedbackType == FeedbackType.others)
               TebTextEdit(
-                context: context,
                 controller: _commentsController,
                 maxLines: 5,
                 labelText: 'Comentários',

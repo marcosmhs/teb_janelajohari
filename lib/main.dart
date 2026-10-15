@@ -16,7 +16,7 @@ import 'package:teb_janelajohari/main/visualizations/landing_screen.dart';
 import 'package:teb_janelajohari/public_area/session/visualizations/session_form.dart';
 import 'package:teb_janelajohari/routes.dart';
 import 'package:teb_janelajohari/screen_not_found.dart';
-import 'package:teb_package/theme/teb_theme_controller.dart';
+import 'package:teb_janelajohari/app_theme_controller.dart';
 import 'firebase_options.dart';
 
 
@@ -24,7 +24,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  var tebThemeController = TebThemeController(
+  var tebThemeController = AppThemeController(
     lightThemeAssetPath: 'assets/theme.json',
     useMaterial3: false,
     useDebugLog: true,
@@ -54,7 +54,7 @@ class _Home extends State<JanelaJohari> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [Locale('en', ''), Locale('pt-br', '')],
+      supportedLocales: const [Locale('en'), Locale('pt', 'BR')],
       title: 'Janela de Johari',
       routes: {
         Routes.landingScreen: (ctx) => const LandingScreen(),

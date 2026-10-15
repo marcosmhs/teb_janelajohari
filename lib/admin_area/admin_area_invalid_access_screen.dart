@@ -16,7 +16,7 @@ class AdminAreaInvalidAccessScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(FontAwesomeIcons.usersSlash, size: 100, color: Colors.black54),
-            TebText('Acesso negado', textSize: 30, padding: EdgeInsets.symmetric(vertical: 20)),
+            TebText('Acesso negado', fontSize: 30, padding: EdgeInsets.symmetric(vertical: 20)),
             TebButton(
               label: 'Voltar',
               buttonType: TebButtonType.outlinedButton,

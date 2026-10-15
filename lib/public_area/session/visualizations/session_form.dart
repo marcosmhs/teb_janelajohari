@@ -25,7 +25,7 @@ class SessionForm extends StatefulWidget {
 }
 
 class _SessionFormState extends State<SessionForm> {
-  final TextEditingController _nameController = TextEditingController(text: 'teste');
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _accessCodeController = TextEditingController();
   final TextEditingController _feedbackUrlController = TextEditingController();
 
@@ -62,18 +62,18 @@ class _SessionFormState extends State<SessionForm> {
                           if (_mobile) const SizedBox(height: 20),
                           TebText(
                             'Lembre-se de salvar os dados de acesso e convite para feedback',
-                            textSize: 16,
-                            textWeight: FontWeight.bold,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                             padding: const EdgeInsets.only(bottom: 10),
                           ),
                           TebText(
                             'Seu código de acesso será necessário para acessar seus feedbacks posteriormente',
-                            textSize: 16,
+                            fontSize: 16,
                             padding: const EdgeInsets.only(bottom: 10),
                           ),
                           TebText(
                             'Guarde-o em um lugar de fácil acesso para que possa usá-lo novamente no futuro :)',
-                            textSize: 16,
+                            fontSize: 16,
                             padding: const EdgeInsets.only(bottom: 10),
                           ),
                           TebButton(
@@ -81,12 +81,12 @@ class _SessionFormState extends State<SessionForm> {
                             onPressed: () {
                               Clipboard.setData(ClipboardData(text: _accessCodeController.text));
                               Navigator.of(ctx).pop(true);
-                              TebMessage.sucess(context, message: 'Código de acesso copiado para sua área de transferência!');
+                              TebMessage.success(context, message: 'Código de acesso copiado para sua área de transferência!');
                             },
                             size: Size(_mobile ? 350 : 450, 70),
                             child: TebText(
                               'Clique aqui para copiar seu <b>código de acesso</b>',
-                              textSize: 16,
+                              fontSize: 16,
                               textAlign: _mobile ? TextAlign.center : null,
                               textType: TextType.html,
                             ),
@@ -110,15 +110,16 @@ class _SessionFormState extends State<SessionForm> {
         var sessionController = SessionController();
         TebReturn retorno;
         try {
-          retorno = TebReturn.sucess;
+          retorno = TebReturn.success;
           retorno = await sessionController.save(session: _session);
-          if (retorno.returnType != TebReturn.sucess.returnType) {
+          if (!mounted) return;
+          if (retorno.returnType != TebReturn.success.returnType) {
             TebMessage.error(context, message: retorno.message);
             _savingData = false;
             return;
           }
 
-          TebMessage.sucess(context, message: _newSession ? 'Sessão criada!' : 'Sessão alterada');
+          TebMessage.success(context, message: _newSession ? 'Sessão criada!' : 'Sessão alterada');
 
           if (_newSession) {
             Navigator.of(context).popAndPushNamed(
@@ -142,10 +143,12 @@ class _SessionFormState extends State<SessionForm> {
       _session = arguments['session'] ?? Session();
       _mobile = arguments['mobile'] ?? false;
       _newSession = _session.id.isEmpty;
-      _session.encryptedAccessCode = _newSession ? TebUidGenerator.invitationCode : _session.encryptedAccessCode;
-      _session.feedbackCode = _newSession ? TebUidGenerator.invitationCode : _session.feedbackCode;
+      if (_newSession) {
+        _session.accessCode = TebUidGenerator.invitationCode;
+        _session.feedbackCode = TebUidGenerator.invitationCode;
+      }
       _initializing = false;
-      _accessCodeController.text = _newSession ? _session.encryptedAccessCode : _session.accessCode;
+      _accessCodeController.text = _session.accessCode;
       _feedbackUrlController.text = _session.sessionFeedbackUrl;
       _nameController.text = _session.name;
     }
@@ -180,13 +183,12 @@ class _SessionFormState extends State<SessionForm> {
 
                       TebText(
                         'Uma sessão é um espaço para você e seu time se conhecerem melhor e trabalharem juntos.',
-                        textSize: 16,
+                        fontSize: 16,
                         padding: const EdgeInsets.only(top: 10, bottom: 5),
                       ),
 
                       // name
                       TebTextEdit(
-                        context: context,
                         width: MediaQuery.of(context).size.width < 700 ? MediaQuery.of(context).size.width * 0.8 : 700,
                         controller: _nameController,
                         labelText: 'Seu nome',
@@ -203,13 +205,12 @@ class _SessionFormState extends State<SessionForm> {
 
                       TebText(
                         'O código de de acesso é único para cada sessão e deve ser salvo para você possa acessá-la no futuro.',
-                        textSize: 16,
+                        fontSize: 16,
                         padding: const EdgeInsets.only(top: 10, bottom: 5),
                       ),
 
                       // Code
                       TebTextEdit(
-                        context: context,
                         width: MediaQuery.of(context).size.width < 700 ? MediaQuery.of(context).size.width * 0.8 : 700,
                         controller: _accessCodeController,
                         labelText: 'Código de acesso da sessão',
@@ -223,19 +224,18 @@ class _SessionFormState extends State<SessionForm> {
                         buttonType: TebButtonType.outlinedButton,
                         onPressed: () {
                           Clipboard.setData(ClipboardData(text: _accessCodeController.text));
-                          TebMessage.sucess(context, message: 'Código copiado para sua área de transferência!');
+                          TebMessage.success(context, message: 'Código copiado para sua área de transferência!');
                         },
                       ),
 
                       TebText(
                         'O link abaixo deve ser compartilhado com as pessoas que você deseja obter um feedback sobre seu comportamento.',
-                        textSize: 16,
+                        fontSize: 16,
                         padding: const EdgeInsets.only(top: 10, bottom: 5),
                       ),
 
                       // Code
                       TebTextEdit(
-                        context: context,
                         width: MediaQuery.of(context).size.width < 700 ? MediaQuery.of(context).size.width * 0.8 : 700,
                         controller: _feedbackUrlController,
                         labelText: 'Link para pedido de feedback',
@@ -249,7 +249,7 @@ class _SessionFormState extends State<SessionForm> {
                         buttonType: TebButtonType.outlinedButton,
                         onPressed: () {
                           Clipboard.setData(ClipboardData(text: _feedbackUrlController.text));
-                          TebMessage.sucess(context, message: 'Link copiado para sua área de transferência!');
+                          TebMessage.success(context, message: 'Link copiado para sua área de transferência!');
                         },
                       ),
                       const SizedBox(height: 20),

@@ -21,7 +21,7 @@ class InvalidAccessScreen extends StatelessWidget {
               Center(
                 child: TebText(
                   'Ops, parece que alguma coisa quebrou por aqui, tente repetir o que fez ou retornar mais tarde.',
-                  textSize: 30,
+                  fontSize: 30,
                   padding: EdgeInsets.symmetric(vertical: 20),
                 ),
               ),

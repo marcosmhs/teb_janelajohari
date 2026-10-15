@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 //https://pub.dev/packages/flutter_html
 
 class CarouselText {
-  static const String colletcionName = 'carousel_area';
+  static const String collectionName = 'carousel_area';
 
   late String id;
   late String area;

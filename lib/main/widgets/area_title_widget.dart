@@ -19,7 +19,7 @@ class AreaTitleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var titleTebTextWidget = TebText(title, textSize: 32.0, letterSpacing: 3.0, textWeight: FontWeight.w700);
+    var titleTebTextWidget = TebText(title, fontSize: 32.0, letterSpacing: 3.0, fontWeight: FontWeight.w700);
 
     return Column(
       children: [
