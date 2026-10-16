@@ -1068,6 +1068,16 @@ a:hover {
   color: var(--ink-muted);
 }
 
+.site-footer .author-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.site-footer .author-link:hover {
+  color: var(--ink);
+}
+
 .social {
   display: flex;
   gap: 4px;
