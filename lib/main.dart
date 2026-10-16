@@ -1,6 +1,4 @@
 // ignore: depend_on_referenced_packages
-import 'package:cloud_firestore/cloud_firestore.dart';
-// ignore: depend_on_referenced_packages
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:flutter/material.dart';
@@ -16,7 +14,7 @@ import 'package:teb_janelajohari/main/visualizations/landing_screen.dart';
 import 'package:teb_janelajohari/public_area/session/visualizations/session_form.dart';
 import 'package:teb_janelajohari/routes.dart';
 import 'package:teb_janelajohari/screen_not_found.dart';
-import 'package:teb_janelajohari/app_theme_controller.dart';
+import 'package:teb_janelajohari/theme/app_theme.dart';
 import 'firebase_options.dart';
 
 
@@ -24,16 +22,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  var tebThemeController = AppThemeController(
-    lightThemeAssetPath: 'assets/theme.json',
-    useMaterial3: false,
-    useDebugLog: true,
-    fireStoreInstance: FirebaseFirestore.instance,
-  );
-
-  await tebThemeController.loadThemeData;
-
-  runApp(JanelaJohari(themeData: tebThemeController.lightThemeData));
+  runApp(JanelaJohari(themeData: AppTheme.light));
 }
 
 class JanelaJohari extends StatefulWidget {

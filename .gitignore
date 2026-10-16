@@ -33,6 +33,13 @@ migrate_working_dir/
 .pub/
 /build/
 
+# Landing estática (Astro)
+/landing/node_modules/
+/landing/dist/
+/landing/.astro/
+# copiado de assets/audio pelo scripts/build-hosting.sh
+/landing/public/audio/
+
 /lib/consts.dart
 /lib/firebase_options.dart
 

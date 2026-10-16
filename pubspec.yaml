@@ -34,9 +34,6 @@ dependencies:
   font_awesome_flutter: ^10.8.0
   flutter_colorpicker: ^1.1.0
   diacritic: ^0.1.6
-  # 9.0.3 passou a usar AppBarThemeData/InputDecorationThemeData (Flutter 3.35+);
-  # travado na linha 9.0.x compatível com o Flutter 3.32 deste projeto.
-  json_theme: ">=9.0.1 <9.0.3"
 
   just_audio: ^0.10.4
   audio_video_progress_bar: ^2.0.3
@@ -46,6 +43,8 @@ dependencies:
   flutter_lints: ^5.0.0
   firebase_core: ^4.0.0
   flutter_html: ^3.0.0
+  google_fonts: ^6.3.2
+  web: ^1.1.1
 
 flutter:
   uses-material-design: true
