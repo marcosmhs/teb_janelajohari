@@ -15,15 +15,20 @@
         "rules":"firestore.rules"
     },
     "hosting":{
-        "public":"build/web",
+        "public":"build/hosting",
         "ignore":[
             "firebase.json",
             "**/.*",
             "**/node_modules/**"
         ],
         "rewrites":[{
-            "source":"**",
-            "destination":"/index.html"
+            "source":"/app/**",
+            "destination":"/app/index.html"
+        }],
+        "redirects":[{
+            "source":"/app",
+            "destination":"/app/",
+            "type":301
         }]
     }
 

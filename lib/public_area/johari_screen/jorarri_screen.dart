@@ -1,23 +1,16 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:teb_janelajohari/main/widgets/area_title_widget.dart';
-import 'package:teb_janelajohari/main/widgets/contact_area.dart';
-import 'package:teb_janelajohari/public_area/invalid_access_screen.dart';
-import 'package:teb_janelajohari/public_area/session_feedbacks/session_feedbacks.dart';
-import 'package:teb_janelajohari/public_area/session_feedbacks/session_feedbacks_controller.dart';
-import 'package:teb_janelajohari/main/widgets/title_bar_widget.dart';
-import 'package:teb_janelajohari/public_area/session/session.dart';
-import 'package:teb_janelajohari/local_data_controller.dart';
-import 'package:teb_janelajohari/routes.dart';
-import 'package:teb_package/control_widgets/teb_buttons_line.dart';
-import 'package:teb_package/control_widgets/teb_text.dart';
-import 'package:teb_package/messaging/teb_message.dart';
-import 'package:teb_package/screen_widgets/teb_scaffold.dart';
 
+import 'package:teb_janelajohari/local_data_controller.dart';
+import 'package:teb_janelajohari/main/widgets/johari_logo.dart';
+import 'package:teb_janelajohari/public_area/invalid_access_screen.dart';
+import 'package:teb_janelajohari/public_area/session_feedbacks/session_feedbacks_controller.dart';
+import 'package:teb_janelajohari/public_area/session_feedbacks/session_feedbacks.dart';
+import 'package:teb_janelajohari/public_area/session/session.dart';
+import 'package:teb_janelajohari/routes.dart';
+import 'package:teb_janelajohari/theme/app_theme.dart';
+import 'package:teb_package/messaging/teb_message.dart';
 
 class JohariScreen extends StatefulWidget {
   final Session? session;
@@ -25,287 +18,545 @@ class JohariScreen extends StatefulWidget {
   const JohariScreen({super.key, this.session, this.mobile});
 
   @override
-  State<JohariScreen> createState() => _MainScreen();
+  State<JohariScreen> createState() => _JohariScreenState();
 }
 
-class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
+class _JohariScreenState extends State<JohariScreen> {
   var _session = Session();
   var _initializing = true;
   var _mobile = false;
-  var _showOthersFeedbackOrderedByAdjectiveName = true;
 
-  final ExpansibleController  expansionTileControllerFeedbacks = ExpansibleController ();
-  final ExpansibleController  expansionTileControllerJohariScreen = ExpansibleController ();
-  final ExpansibleController  expansionTileControllerAiPrompt = ExpansibleController ();
+  List<String> _list(Map<String, dynamic> area, String key) => List<String>.from(area[key] ?? const <String>[]);
+
+  void _copy(String value, String message) {
+    Clipboard.setData(ClipboardData(text: value));
+    TebMessage.success(context, message: message);
+  }
 
   void _confirmExit() {
     showDialog<bool>(
-      useSafeArea: false,
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            content: SizedBox(
-              width: _mobile ? 300 : 600,
-              height: _mobile ? 500 : 320,
-              child: Row(
-                children: [
-                  if (!_mobile) Icon(FontAwesomeIcons.handPointUp, size: 80, color: Theme.of(context).colorScheme.tertiary),
-                  if (!_mobile) const SizedBox(width: 20),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (_mobile) Icon(FontAwesomeIcons.handPointUp, size: 50, color: Theme.of(context).colorScheme.tertiary),
-                        if (_mobile) const SizedBox(height: 20),
-                        TebText(
-                          'Lembre-se de salvar os dados de acesso e convite para feedback',
-                          fontSize: 24,
-                          textType: TextType.html,
-                          fontWeight: FontWeight.bold,
-                          padding: const EdgeInsets.only(bottom: 10),
-                        ),
-                        TebText(
-                          'Seu código de acesso (<b>${_session.accessCode}</b>) será necessário para acessar seus feedbacks posteriormente',
-                          fontSize: 16,
-                          textType: TextType.html,
-                          padding: const EdgeInsets.only(bottom: 10),
-                        ),
-                        TebText(
-                          'Guarde-o em um lugar de fácil acesso para que possa usá-lo novamente no futuro :)',
-                          fontSize: 16,
-                          textType: TextType.html,
-                          padding: const EdgeInsets.only(bottom: 10),
-                        ),
-                        TebButton(
-                          buttonType: TebButtonType.outlinedButton,
-                          onPressed: () {
-                            Clipboard.setData(ClipboardData(text: _session.accessCode));
-                            Navigator.of(ctx).pop(true);
-                            TebMessage.success(context, message: 'Código de acesso copiado para sua área de transferência!');
-                          },
-                          size: Size(_mobile ? 350 : 450, 90),
-                          child: TebText(
-                            'Clique aqui para copiar seu <b>código de acesso</b> para a área de transferência e deixar sua sessão',
-                            fontSize: 16,
-                            textAlign: _mobile ? TextAlign.center : null,
-                            textType: TextType.html,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
+        content: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 440),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Guarde seu código de acesso', style: AppTheme.display(const TextStyle(fontSize: 24, color: AppColors.ink))),
+              const SizedBox(height: 12),
+              Text(
+                'Seu código (${_session.accessCode}) é a única forma de voltar aos seus resultados. '
+                'Copie-o antes de sair.',
+                style: AppTheme.body(const TextStyle(fontSize: 15, color: AppColors.inkSoft, height: 1.5)),
               ),
-            ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.copy, size: 18),
+                  label: const Text('Copiar código e sair'),
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: _session.accessCode));
+                    Navigator.of(ctx).pop(true);
+                  },
+                ),
+              ),
+            ],
           ),
-    ).then((value) async {
-      if ((value ?? false) == true) {
+        ),
+      ),
+    ).then((value) {
+      if (value == true && mounted) {
         LocalDataController().clearSessionData();
         Navigator.of(context).popAndPushNamed(Routes.landingScreen, arguments: {'ignoreQueryParameters': true});
       }
     });
   }
 
-  Widget _adjectiveController({
-    required String title,
-    String? subtitle,
-    required List<String> adjectives,
-    bool isPositive = true,
-    required Color color,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        TebText(title, fontSize: 24, fontWeight: FontWeight.bold),
+  @override
+  Widget build(BuildContext context) {
+    if (_initializing) {
+      final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
+      _session = arguments['session'] ?? Session();
+      _mobile = arguments['mobile'] ?? false;
+      _mobile = widget.mobile ?? _mobile;
+      if (widget.session != null && widget.session!.id.isNotEmpty) _session = widget.session!;
+      _initializing = false;
+    }
 
-        if (subtitle != null) TebText(subtitle, fontSize: 16),
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: 8),
-          child: Wrap(
-            spacing: 24.0,
-            runSpacing: 12.0,
-            children:
-                adjectives.map((adjective) {
-                  return FilterChip(
-                    label: TebText(adjective),
-                    selected: false,
-                    backgroundColor: color.withAlpha(50),
-                    onSelected: (bool selected) {
-                      return;
-                    },
-                  );
-                }).toList(),
-          ),
-        ),
-      ],
-    );
-  }
+    if (_session.id.isEmpty) return const InvalidAccessScreen();
 
-  Widget _windowArea({
-    required String title,
-    required String? subtitle,
-    required Color color,
-    IconData? icon,
-    List<String>? positiveAdjectives,
-    List<String>? constructiveAdjectives,
-    List<String>? othersComments,
-    int? othersFeedbackCount,
-    bool selfFeedbackArea = false,
-    bool othersFeedbackArea = false,
-  }) {
-    var othersFeedbackOrderWidget = Row(
-      children: [
-        const TebText('Ordenar por: '),
-        TebButton(
-          onPressed: () => setState(() => _showOthersFeedbackOrderedByAdjectiveName = true),
-          buttonType: TebButtonType.outlinedButton,
-          child: TebText('Adjetivo', fontWeight: _showOthersFeedbackOrderedByAdjectiveName ? FontWeight.bold : FontWeight.normal),
-        ),
-        const SizedBox(width: 10),
-        TebButton(
-          onPressed: () => setState(() => _showOthersFeedbackOrderedByAdjectiveName = false),
-          buttonType: TebButtonType.outlinedButton,
-          child: TebText(
-            'Quantidade de feedbacks',
-            fontWeight: _showOthersFeedbackOrderedByAdjectiveName ? FontWeight.normal : FontWeight.bold,
-          ),
-        ),
-      ],
-    );
-    var titleWidget = Row(
-      children: [
-        TebText(title, fontSize: 30, fontWeight: FontWeight.bold),
+    final narrow = _mobile || MediaQuery.of(context).size.width < 900;
 
-        if (selfFeedbackArea)
-          TebButton(
-            label: 'Alterar',
-            buttonType: TebButtonType.outlinedButton,
-            padding: EdgeInsets.only(left: 10),
-            onPressed: () async {
-              var sessionFeedbacks = await SessionFeedbackController().getSessionSelfFeedbackBySessionId(sessionId: _session.id);
-              Navigator.of(context).pushNamed(
-                Routes.feedbackScreen,
-                arguments: {
-                  'session': _session,
-                  'sessionFeedbacks': sessionFeedbacks,
-                  'feedbackType': FeedbackType.self,
-                  'mobile': _mobile,
-                },
-              );
-            },
-          ),
-        if (othersFeedbackArea && !_mobile) const SizedBox(width: 10),
-        if (othersFeedbackArea && !_mobile) othersFeedbackOrderWidget,
-      ],
-    );
+    return Scaffold(
+      backgroundColor: AppColors.cream,
+      body: StreamBuilder<QuerySnapshot>(
+        stream: SessionFeedbackController().getSessionFeedbacks(sessionId: _session.id),
+        builder: (context, snapshot) {
+          final List<SessionFeedbacks> sessionFeedbacks = [];
+          if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+            sessionFeedbacks.addAll(snapshot.data!.docs.map((e) => SessionFeedbacks.fromDocument(e)));
+          }
+          final feedbacks = SessionFeedbackController.getAllAreasFeedback(feedbacks: sessionFeedbacks);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          titleWidget,
-          // othersFeedbackOrderWidget display in the main column when
-          // is a mobile screen
-          if (othersFeedbackArea && _mobile) othersFeedbackOrderWidget,
-          if (othersFeedbackArea && _mobile) const SizedBox(height: 10),
-          Container(
-            width: MediaQuery.of(context).size.width * 0.9,
-            padding: const EdgeInsets.all(20.0),
-            decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(12.0)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (subtitle != null)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    child: Row(
-                      children: [
-                        if (icon != null) Padding(padding: const EdgeInsets.only(right: 20), child: Icon(icon, size: 30)),
-                        Expanded(child: TebText(subtitle, textType: TextType.html, fontSize: 20)),
-                      ],
+          final self = feedbacks['selfFeedback']!;
+          final others = feedbacks['othersFeedback']!;
+          final open = feedbacks['openArea']!;
+          final blind = feedbacks['blindArea']!;
+          final hidden = feedbacks['hiddenArea']!;
+
+          final selfCount = _list(self, 'positiveAdjectives').length + _list(self, 'constructiveAdjectives').length;
+          final othersCount = (others['count'] ?? 0) as int;
+          final openAll = [..._list(open, 'positiveAdjectives'), ..._list(open, 'constructiveAdjectives')];
+          final comments = _list(others, 'comments');
+
+          return Column(
+            children: [
+              _header(),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1240),
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(narrow ? 20 : 48, 40, narrow ? 20 : 48, 80),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _greeting(othersCount, selfCount, openAll.length, narrow),
+                            const SizedBox(height: 28),
+                            narrow
+                                ? Column(
+                                    children: [
+                                      _matrix(open, blind, hidden, narrow),
+                                      const SizedBox(height: 24),
+                                      _sidebar(feedbacks, comments),
+                                    ],
+                                  )
+                                : Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(flex: 3, child: _matrix(open, blind, hidden, narrow)),
+                                      const SizedBox(width: 28),
+                                      SizedBox(width: 360, child: _sidebar(feedbacks, comments)),
+                                    ],
+                                  ),
+                            const SizedBox(height: 40),
+                            Center(
+                              child: OutlinedButton.icon(
+                                onPressed: _confirmExit,
+                                icon: const Icon(Icons.logout, size: 18),
+                                label: const Text('Deixar esta sessão'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                if (othersFeedbackCount != null)
-                  TebText(
-                    othersFeedbackCount == 0
-                        ? 'Até agora você não recebeu feedbacks, envie seu link de feedback para seus colegas e peça para eles responderem a pesquisa.'
-                        : 'Até agora você recebeu $othersFeedbackCount feedbacks',
-                    fontSize: 16,
-                    padding: EdgeInsets.symmetric(vertical: 8),
-                  ),
-                if ((positiveAdjectives ?? []).isNotEmpty)
-                  _adjectiveController(
-                    title: 'Positivos',
-                    subtitle: 'Atitudes e comportamentos percebidos como positivos',
-                    adjectives: (positiveAdjectives ?? []),
-                    color: color,
-                  ),
-                if ((constructiveAdjectives ?? []).isNotEmpty)
-                  _adjectiveController(
-                    title: 'Construtivos',
-                    subtitle: 'Atitudes e comportamentos com oportunidades para desenvolvimento',
-                    adjectives: (constructiveAdjectives ?? []),
-                    isPositive: false,
-                    color: color,
-                  ),
-                if ((othersComments ?? []).isNotEmpty)
-                  TebText(
-                    'Abaixo está uma lista de comentários deixado pelas pessoas que contribuiram com seu feedback',
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    padding: const EdgeInsets.only(top: 18, bottom: 10),
-                  ),
-
-                if ((othersComments ?? []).isNotEmpty)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children:
-                        othersComments!.map((comment) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(FontAwesomeIcons.message),
-                                Expanded(
-                                  child: TebText(
-                                    comment,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    padding: EdgeInsets.only(left: 10),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                  ),
-              ],
-            ),
-          ),
-        ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  String _getAdjectivesListText(List<String>? list) {
-    return list == null
-        ? ''
-        : list.isEmpty
-        ? ''
-        : list.join(', ');
+  Widget _header() {
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.cream,
+        border: Border(bottom: BorderSide(color: AppColors.border)),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: _mobile ? 20 : 48, vertical: 14),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Flexible(child: JohariLogo()),
+            Wrap(
+              spacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                if (!_mobile)
+                  RichText(
+                    text: TextSpan(
+                      style: AppTheme.body(const TextStyle(fontSize: 14, color: AppColors.inkSoft)),
+                      children: [
+                        const TextSpan(text: 'Código '),
+                        TextSpan(
+                          text: _session.accessCode,
+                          style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.amberDark, fontFamily: 'monospace'),
+                        ),
+                      ],
+                    ),
+                  ),
+                TextButton(onPressed: _confirmExit, child: const Text('Sair')),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _greeting(int othersCount, int selfCount, int openCount, bool narrow) {
+    Widget stat(String label, String value, {Color? bg, Color? fg}) => Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      constraints: const BoxConstraints(minWidth: 120),
+      decoration: BoxDecoration(
+        color: bg ?? AppColors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: bg == null ? Border.all(color: AppColors.border) : null,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: AppTheme.body(TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: fg ?? AppColors.inkMuted)),
+          ),
+          const SizedBox(height: 2),
+          Text(value, style: AppTheme.display(TextStyle(fontSize: 30, color: fg ?? AppColors.ink))),
+        ],
+      ),
+    );
+
+    final title = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'SUA JANELA',
+          style: AppTheme.body(const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 1.1, color: AppColors.teal)),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Olá, ${_session.name}. Veja como você é percebido(a).',
+          style: AppTheme.display(TextStyle(fontSize: narrow ? 32 : 46, color: AppColors.ink, height: 1.05, letterSpacing: -0.5)),
+        ),
+      ],
+    );
+
+    final stats = Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: [
+        stat('Feedbacks recebidos', '$othersCount'),
+        stat('Na sua autoavaliação', '$selfCount'),
+        stat('Em comum', '$openCount', bg: AppColors.tealSoft, fg: AppColors.tealDark),
+      ],
+    );
+
+    return narrow
+        ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [title, const SizedBox(height: 20), stats])
+        : Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(child: title),
+              const SizedBox(width: 24),
+              stats,
+            ],
+          );
+  }
+
+  Widget _matrix(Map<String, dynamic> open, Map<String, dynamic> blind, Map<String, dynamic> hidden, bool narrow) {
+    final cells = [
+      _quadrant(
+        'Aberto',
+        'Você sabe · Outros sabem',
+        'Você e os colegas concordam.',
+        AppColors.tealDark,
+        AppColors.tealSoft,
+        [..._list(open, 'positiveAdjectives'), ..._list(open, 'constructiveAdjectives')],
+        emptyText: 'Ainda sem adjetivos em comum.',
+      ),
+      _quadrant(
+        'Cego',
+        'Você não · Outros sabem',
+        'Os colegas veem e você não marcou.',
+        AppColors.blueDark,
+        AppColors.blueSoft,
+        [..._list(blind, 'positiveAdjectives'), ..._list(blind, 'constructiveAdjectives')],
+        emptyText: 'Nada aqui — por enquanto.',
+      ),
+      _quadrant(
+        'Oculto',
+        'Você sabe · Outros não',
+        'Só você marcou — ainda não aparece para os outros.',
+        AppColors.amberDark,
+        AppColors.amberSoft,
+        [..._list(hidden, 'positiveAdjectives'), ..._list(hidden, 'constructiveAdjectives')],
+        emptyText: 'Nada guardado só para você.',
+      ),
+      _quadrantUnknown(),
+    ];
+
+    if (narrow) {
+      return Column(
+        children: [
+          for (final c in cells)
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(color: c.bg, borderRadius: BorderRadius.circular(AppRadius.card)),
+              child: c.content,
+            ),
+        ],
+      );
+    }
+    return Column(children: [_quadrantRow(cells[0], cells[1]), const SizedBox(height: 12), _quadrantRow(cells[2], cells[3])]);
+  }
+
+  /// Dois quadrantes lado a lado com a mesma altura. O conteúdo define a
+  /// altura pelo layout normal e os fundos se esticam atrás dele — sem
+  /// IntrinsicHeight, cuja medição pode divergir e gerar overflow.
+  Widget _quadrantRow(({Color bg, Widget content}) left, ({Color bg, Widget content}) right) {
+    Widget background(Color bg) => Expanded(
+      child: DecoratedBox(
+        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(AppRadius.card)),
+      ),
+    );
+    return Stack(
+      children: [
+        Positioned.fill(child: Row(children: [background(left.bg), const SizedBox(width: 12), background(right.bg)])),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: left.content),
+            const SizedBox(width: 12),
+            Expanded(child: right.content),
+          ],
+        ),
+      ],
+    );
+  }
+
+  ({Color bg, Widget content}) _quadrant(
+    String title,
+    String corner,
+    String desc,
+    Color color,
+    Color bg,
+    List<String> adjectives, {
+    required String emptyText,
+  }) {
+    return (
+      bg: bg,
+      content: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: AppTheme.display(TextStyle(fontSize: 26, color: color))),
+                Flexible(
+                  child: Text(
+                    corner,
+                    textAlign: TextAlign.right,
+                    style: AppTheme.body(TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: color)),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(desc, style: AppTheme.body(TextStyle(fontSize: 14, color: color.withValues(alpha: 0.85)))),
+            const SizedBox(height: 12),
+            if (adjectives.isEmpty)
+              Text(
+                emptyText,
+                style: AppTheme.body(TextStyle(fontSize: 14, color: color.withValues(alpha: 0.7), fontStyle: FontStyle.italic)),
+              )
+            else
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: (adjectives.toSet().toList()..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase())))
+                    .map(
+                      (a) => Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(AppRadius.pill)),
+                        child: Text(
+                          a,
+                          style: AppTheme.body(TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: color)),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  ({Color bg, Widget content}) _quadrantUnknown() {
+    return (
+      bg: AppColors.purpleSoft,
+      content: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Desconhecido', style: AppTheme.display(const TextStyle(fontSize: 26, color: AppColors.purpleDark))),
+                Text(
+                  'Ninguém marcou',
+                  style: AppTheme.body(const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: AppColors.purpleDark)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Potenciais ainda não revelados — ou que não fazem parte de você. Costumam aparecer com novas experiências e desafios.',
+              style: AppTheme.body(TextStyle(fontSize: 14, color: AppColors.purpleDark.withValues(alpha: 0.85))),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _sidebar(Map<String, Map<String, dynamic>> feedbacks, List<String> comments) {
+    final promptText = _getIAText(feedbacks);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // IA
+        Container(
+          padding: const EdgeInsets.all(26),
+          decoration: BoxDecoration(color: AppColors.panel, borderRadius: BorderRadius.circular(AppRadius.cardLarge)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.auto_awesome, size: 18, color: AppColors.tealOnDark),
+                  const SizedBox(width: 8),
+                  Text(
+                    'ANÁLISE COM IA',
+                    style: AppTheme.body(
+                      const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 1.1, color: AppColors.tealOnDark),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Text(
+                'Transforme sua janela em um plano',
+                style: AppTheme.display(const TextStyle(fontSize: 24, color: Colors.white, height: 1.15)),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Copie o prompt pronto e cole no assistente de IA que preferir.',
+                style: AppTheme.body(const TextStyle(fontSize: 15, color: AppColors.onPanel)),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                constraints: const BoxConstraints(maxHeight: 220),
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(color: AppColors.panelSoft, borderRadius: BorderRadius.circular(16)),
+                child: SingleChildScrollView(
+                  child: Text(
+                    promptText,
+                    style: const TextStyle(fontFamily: 'monospace', fontSize: 12.5, height: 1.5, color: Color(0xFFDCE3EA)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.ink),
+                  icon: const Icon(Icons.copy, size: 18),
+                  label: const Text('Copiar prompt'),
+                  onPressed: () => _copy(promptText, 'Prompt copiado para sua área de transferência!'),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        // Share
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(color: AppColors.tealSoft, borderRadius: BorderRadius.circular(AppRadius.card)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Quanto mais olhares, mais nítida a janela',
+                style: AppTheme.body(const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.tealDark)),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.link, size: 18),
+                  label: const Text('Copiar link de feedback'),
+                  onPressed: () => _copy(_session.sessionFeedbackUrl, 'Link copiado para sua área de transferência!'),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (comments.isNotEmpty) ...[
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(AppRadius.card),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Comentários dos colegas (${comments.length})',
+                  style: AppTheme.body(const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.ink)),
+                ),
+                const SizedBox(height: 14),
+                ...comments.map(
+                  (c) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(color: AppColors.cream, borderRadius: BorderRadius.circular(16)),
+                      child: Text(c, style: AppTheme.body(const TextStyle(fontSize: 15, color: Color(0xFF33404C), height: 1.4))),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------------------
+  // Prompt de IA (mantido do comportamento original).
+  // ---------------------------------------------------------------------
+
+  String _getAdjectivesListText(List<dynamic>? list) {
+    if (list == null || list.isEmpty) return '';
+    return list.map((e) => e.toString()).join(', ');
   }
 
   String _getIAText(Map<String, Map<String, dynamic>> feedbacks) {
-    var commentsList =
-        feedbacks['othersFeedback']!['comments'] == null
-            ? ''
-            : feedbacks['othersFeedback']!['comments'].isEmpty
-            ? ''
-            : feedbacks['othersFeedback']!['comments'].map((item) => '   "$item"\n').join();
+    final commentsRaw = feedbacks['othersFeedback']!['comments'];
+    final commentsList = (commentsRaw == null || (commentsRaw as List).isEmpty) ? '' : commentsRaw.map((item) => '   "$item"\n').join();
 
     var text =
         'Você é um analista de desenvolvimento humano e comportamento.\n'
@@ -338,7 +589,7 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
         '  - Interpretações sobre o que isso pode significar em seu contexto profissional ou pessoal.\n'
         '  - Sugestões práticas de desenvolvimento (ex: conversas de feedback, coaching, novos comportamentos, etc.)';
 
-    var replaceStringList = {
+    final replaceStringList = {
       '#LISTA_COMENTARIOS#': commentsList,
       '#AREA_ABERTA_ADJETIVOS_POSITIVOS#': _getAdjectivesListText(feedbacks['openArea']!['positiveAdjectives']),
       '#AREA_ABERTA_ADJETIVOS_CONSTRUTIVOS#': _getAdjectivesListText(feedbacks['openArea']!['constructiveAdjectives']),
@@ -349,264 +600,6 @@ class _MainScreen extends State<JohariScreen> with TickerProviderStateMixin {
     };
 
     replaceStringList.forEach((key, value) => text = text.replaceAll(key, value));
-
     return text;
-  }
-
-  Widget _expandedTileArea({
-    required Size size,
-    required bool mobile,
-    required String title,
-    required String? subtitle,
-    required ExpansibleController  controller,
-    required Widget children,
-  }) {
-    return ExpansionTile(
-      initiallyExpanded: true,
-      showTrailingIcon: mobile,
-      title:
-          mobile
-              ? AreaTitleWidget(size: size, title: title, mobile: mobile, cropped: true)
-              : Row(
-                children: [
-                  AreaTitleWidget(size: size, title: title, mobile: mobile, cropped: true, lineWidth: 0),
-                  const Spacer(),
-                  TebButton(
-                    label: 'Exibir/Recolher',
-                    icon: Icon(FontAwesomeIcons.eye),
-                    buttonType: TebButtonType.outlinedButton,
-                    onPressed: () {
-                      if (controller.isExpanded) {
-                        controller.collapse();
-                      } else {
-                        controller.expand();
-                      }
-                    },
-                  ),
-                ],
-              ),
-      subtitle: subtitle == null ? null : TebText(subtitle, fontSize: 20),
-      controller: controller,
-      children: [children],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_initializing) {
-      final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
-      _session = arguments['session'] ?? Session();
-      _mobile = arguments['mobile'] ?? false;
-
-      _mobile = widget.mobile ?? _mobile;
-
-      if (widget.session != null && widget.session!.id.isNotEmpty) _session = widget.session!;
-
-      _initializing = false;
-    }
-
-    if (_session.id.isEmpty) {
-      return InvalidAccessScreen();
-    }
-
-    var size = MediaQuery.of(context).size;
-
-    return StreamBuilder<QuerySnapshot>(
-      stream: SessionFeedbackController().getSessionFeedbacks(sessionId: _session.id),
-      builder: (context, snapshot) {
-        List<SessionFeedbacks> sessionFeedbacks = [];
-
-        if ((snapshot.hasData) && (snapshot.data!.docs.isNotEmpty)) {
-          sessionFeedbacks.addAll(snapshot.data!.docs.map((e) => SessionFeedbacks.fromDocument(e)).toList());
-        }
-
-        var feedbacks = SessionFeedbackController.getAllAreasFeedback(feedbacks: sessionFeedbacks);
-
-        return TebScaffold(
-          responsive: false,
-          showAppBar: false,
-          fixedWidth: size.width * 0.9,
-          body: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: TitleBarWidget(
-                        session: _session,
-                        context: context,
-                        feedbackType: FeedbackType.self,
-                        mobile: _mobile,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 30),
-
-                // --------------------------------
-                // Feedbacks
-                // --------------------------------
-                _expandedTileArea(
-                  size: size,
-                  mobile: _mobile,
-                  title: 'Feedbacks',
-                  subtitle: 'Resumo de seu feedback pessoal e da percepção de seus colegas',
-                  controller: expansionTileControllerFeedbacks,
-                  children: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      _windowArea(
-                        title: 'Seu feedback',
-                        subtitle: 'Lista de adjetivos selecionados por você',
-                        selfFeedbackArea: true,
-                        color: SessionFeedbacks.selfFeedbackAreaColor,
-                        positiveAdjectives: feedbacks['selfFeedback']!['positiveAdjectives'],
-                        constructiveAdjectives: feedbacks['selfFeedback']!['constructiveAdjectives'],
-                        icon: FontAwesomeIcons.imagePortrait,
-                      ),
-                      const SizedBox(height: 20),
-                      _windowArea(
-                        title: 'Feedback de seus colegas',
-                        othersFeedbackArea: true,
-                        subtitle: 'Lista unificada de todos os adjetivos indicados por seus colegas',
-                        color: SessionFeedbacks.othersFeedbackAreaColor,
-                        positiveAdjectives:
-                            _showOthersFeedbackOrderedByAdjectiveName
-                                ? feedbacks['othersFeedback']!['positiveAdjectives']
-                                : feedbacks['othersFeedback']!['positiveAdjectivesWithCount'],
-                        constructiveAdjectives:
-                            _showOthersFeedbackOrderedByAdjectiveName
-                                ? feedbacks['othersFeedback']!['constructiveAdjectives']
-                                : feedbacks['othersFeedback']!['constructiveAdjectivesWithCount'],
-                        othersComments: feedbacks['othersFeedback']!['comments'],
-                        othersFeedbackCount: feedbacks['othersFeedback']!['count'],
-                        icon: FontAwesomeIcons.peopleGroup,
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                // --------------------------------
-                // Johari Screen
-                // --------------------------------
-                _expandedTileArea(
-                  size: size,
-                  mobile: _mobile,
-                  title: 'Sua Janela de Johari',
-                  subtitle: 'Abaixo estão as áreas de sua janela',
-                  controller: expansionTileControllerJohariScreen,
-                  children: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      _windowArea(
-                        title: 'Área Aberta',
-                        subtitle:
-                            'A área aberta, também conhecida como "Eu Aberto", representa <b>tudo o que você conhece sobre '
-                            'si mesmo(a) e que é também conhecido pelos outros</b>. É a zona de transparência e confiança, onde '
-                            'características e comportamentos são compartilhados livremente e há uma compreensão mútua entre você '
-                            'e todos a sua volta.',
-                        color: SessionFeedbacks.openAreaColor,
-                        positiveAdjectives: feedbacks['openArea']!['positiveAdjectives'],
-                        constructiveAdjectives: feedbacks['openArea']!['constructiveAdjectives'],
-                        icon: FontAwesomeIcons.eye,
-                      ),
-                      const SizedBox(height: 20),
-                      _windowArea(
-                        title: 'Área Cega',
-                        subtitle:
-                            'Esta área apresenta todos os <b>comportamentos e características percebidos pelos pelos outros, '
-                            'mas não por você</b>. Nesta área estão as oportunidades para rever comportamentos ou atitudes que '
-                            'podem impactar negativamente as pessoas a sua volta.',
-                        color: SessionFeedbacks.blindAreaColor,
-                        positiveAdjectives: feedbacks['blindArea']!['positiveAdjectives'],
-                        constructiveAdjectives: feedbacks['blindArea']!['constructiveAdjectives'],
-                        icon: FontAwesomeIcons.eyeSlash,
-                      ),
-                      const SizedBox(height: 20),
-                      _windowArea(
-                        title: 'Área Oculta',
-                        subtitle:
-                            'Nesta área estão as características, comportamentos, pensamentos e sentimentos <b>conhecida '
-                            'por nós, mas não pelos outros.</b>',
-                        color: SessionFeedbacks.hiddenAreaColor,
-                        positiveAdjectives: feedbacks['hiddenArea']!['positiveAdjectives'],
-                        constructiveAdjectives: feedbacks['hiddenArea']!['constructiveAdjectives'],
-                        icon: FontAwesomeIcons.doorClosed,
-                      ),
-                      const SizedBox(height: 20),
-                      _windowArea(
-                        title: 'Área Desconhecida',
-                        subtitle:
-                            'Esta é uma área conceitual onde está tudo o que é desconhecida por nós e pelos outros. '
-                            'Representa o potencial que ainda não foi explorado ou descoberto. Por isso não é possível determinar '
-                            'quais características estão presentes nela à partir desta dinâmica.',
-                        color: SessionFeedbacks.unknorAreaColor,
-                        icon: FontAwesomeIcons.question,
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                // --------------------------------
-                // AI Prompt
-                // --------------------------------
-                _expandedTileArea(
-                  size: size,
-                  mobile: _mobile,
-                  title: 'Prompt para análise utilizando IA',
-                  subtitle:
-                      'Utilize o texto abaixo como uma proposta para enviar para uma IA de '
-                      'sua escolha para lhe ajudar como um plano de desenvolvimento para sua carreira. '
-                      'Este prompt pode ser alterado de acordo com suas necessidades.',
-                  controller: expansionTileControllerAiPrompt,
-                  children: Container(
-                    padding: const EdgeInsets.all(20.0),
-                    decoration: BoxDecoration(color: Colors.blueGrey.shade100, borderRadius: BorderRadius.circular(12.0)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(20.0),
-                          decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(12.0)),
-                          child: TebText(_getIAText(feedbacks), padding: EdgeInsets.only(bottom: 10)),
-                        ),
-                        TebButton(
-                          padding: EdgeInsets.only(top: 20),
-                          label: 'Copiar texto',
-                          onPressed: () {
-                            Clipboard.setData(ClipboardData(text: _getIAText(feedbacks)));
-                            TebMessage.success(context, message: 'Texto copiado para sua área de transferência!');
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 50),
-                TebButton(
-                  label: 'Deixar esta sessão',
-                  textStyle: TextStyle(fontSize: 18),
-                  size: Size(280, 40),
-                  onPressed: _confirmExit,
-                  icon: Icon(FontAwesomeIcons.arrowRightToBracket, size: 30),
-                ),
-                const SizedBox(height: 40),
-                ContactArea(mobile: _mobile),
-              ],
-            ),
-          ),
-        );
-      },
-    );
   }
 }

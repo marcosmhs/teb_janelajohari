@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:teb_janelajohari/consts.dart';
+import 'package:teb_janelajohari/web_handoff.dart';
 import 'package:teb_package/util/teb_aes_encrypt.dart';
 
 class Session {
@@ -167,7 +168,16 @@ class Session {
     return session;
   }
 
-  String get sessionFeedbackUrl => 'https://teb-janelajohari.web.app?session_feedback_code=$feedbackCode';
+  static const _productionUrl = 'https://teb-janelajohari.web.app/app/';
+
+  /// Endereço do app no site aberto: /app/ no deploy híbrido (landing estática
+  /// na raiz) ou a raiz em desenvolvimento; sem origem http, a produção.
+  static String get _appUrl {
+    if (!Uri.base.isScheme('http') && !Uri.base.isScheme('https')) return _productionUrl;
+    return '${Uri.base.origin}${WebHandoff.underApp ? '/app/' : '/'}';
+  }
+
+  String get sessionFeedbackUrl => '$_appUrl?session_feedback_code=$feedbackCode';
 
   Map<String, dynamic> get toMap => {
     'id': id,

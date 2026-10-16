@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:teb_janelajohari/main/widgets/status_message_screen.dart';
 import 'package:teb_janelajohari/routes.dart';
-import 'package:teb_package/control_widgets/teb_buttons_line.dart';
-import 'package:teb_package/control_widgets/teb_text.dart';
-import 'package:teb_package/screen_widgets/teb_scaffold.dart';
+import 'package:teb_janelajohari/theme/app_theme.dart';
 
 class ErrorScreen extends StatelessWidget {
   final String errorMessage;
@@ -11,27 +10,18 @@ class ErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
-    var finalMessage = arguments['errorMessage'] ?? errorMessage;
+    final String finalMessage = arguments['errorMessage'] ?? errorMessage;
 
-    return TebScaffold(
-      body: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const TebText('Ops, parece que houve um erro', fontSize: 20, fontWeight: FontWeight.bold, fontColor: Colors.red),
-            const SizedBox(height: 20),
-            Text(finalMessage, textAlign: TextAlign.center, style: const TextStyle(fontSize: 20)),
-            TebButton(
-              label: 'Voltar para tela inicial',
-
-              onPressed: () {
-                Navigator.of(context).pushReplacementNamed(Routes.landingScreen, arguments: {'ignoreQueryParameters': true});
-              },
-            ),
-          ],
-        ),
-      ),
+    return StatusMessageScreen(
+      icon: Icons.error_outline_rounded,
+      accent: AppColors.error,
+      accentSoft: AppColors.error.withValues(alpha: 0.1),
+      title: 'Ops, parece que houve um erro',
+      message: 'Algo não saiu como esperado. Volte para a tela inicial e tente novamente.',
+      detail: finalMessage,
+      actionLabel: 'Voltar para tela inicial',
+      onAction:
+          () => Navigator.of(context).pushReplacementNamed(Routes.landingScreen, arguments: {'ignoreQueryParameters': true}),
     );
   }
 }

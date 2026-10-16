@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:teb_janelajohari/main/widgets/status_message_screen.dart';
 import 'package:teb_janelajohari/routes.dart';
+import 'package:teb_janelajohari/theme/app_theme.dart';
 
 class ScreenNotFound extends StatelessWidget {
   final String screenName;
@@ -9,29 +11,16 @@ class ScreenNotFound extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Row(children: <Widget>[Icon(Icons.error), SizedBox(width: 20), Text("Erro")])),
-      body: Container(
-        padding: const EdgeInsets.all(15),
-        child: Center(
-          child: Column(
-            children: <Widget>[
-              Text("Tela não encontrada", style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 15),
-              Text('Rota: $screenName'),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: Theme.of(context).primaryColor,
-        onPressed: () {
-          // limpa a stak de telas e chama a tela inicial
-          Navigator.restorablePushNamedAndRemoveUntil(context, Routes.landingScreen, (route) => false);
-        },
-        label: const Text('Tela Inicial'),
-        icon: const Icon(Icons.home),
-      ),
+    return StatusMessageScreen(
+      icon: Icons.explore_off_outlined,
+      accent: AppColors.purple,
+      accentSoft: AppColors.purpleSoft,
+      title: 'Tela não encontrada',
+      message: 'O endereço acessado não existe ou foi movido.',
+      detail: 'Rota: $screenName',
+      actionLabel: 'Tela inicial',
+      // limpa a pilha de telas e chama a tela inicial
+      onAction: () => Navigator.restorablePushNamedAndRemoveUntil(context, Routes.landingScreen, (route) => false),
     );
   }
 }

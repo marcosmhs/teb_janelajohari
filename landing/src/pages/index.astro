@@ -1,0 +1,544 @@
+---
+import '../styles/global.css';
+
+const site = 'https://teb-janelajohari.web.app/';
+const title = 'Janela de Johari online e gratuita — autoconhecimento e feedback';
+const description =
+  'Faça a dinâmica da Janela de Johari online: escolha os adjetivos que te descrevem, receba o feedback de colegas por link e veja seus quadrantes Aberto, Cego, Oculto e Desconhecido. Sem cadastro.';
+const year = new Date().getFullYear();
+
+// Cores dos quadrantes, na ordem da grade: Aberto, Cego, Oculto, Desconhecido.
+const quadrantColors = ['#1F7A72', '#2F5E9E', '#A65A16', '#6B4E9B'];
+const muted = '#E4E0D8';
+const cellPos = [
+  [0, 0],
+  [19, 0],
+  [0, 19],
+  [19, 19],
+];
+
+const quadrants = [
+  {
+    name: 'Aberto',
+    index: 0,
+    color: 'var(--teal-dark)',
+    soft: 'var(--teal-soft)',
+    self: true,
+    others: true,
+    text: 'Características que você reconhece em si e que os outros também percebem. É a base de uma comunicação aberta.',
+  },
+  {
+    name: 'Oculto',
+    index: 2,
+    color: 'var(--amber-dark)',
+    soft: 'var(--amber-soft)',
+    self: true,
+    others: false,
+    text: 'O que você conhece sobre si, mas não mostra: sentimentos, receios, intenções. Diminui quando você se abre.',
+  },
+  {
+    name: 'Cego',
+    index: 1,
+    color: 'var(--blue-dark)',
+    soft: 'var(--blue-soft)',
+    self: false,
+    others: true,
+    text: 'O que os outros percebem em você e você ainda não enxerga. Diminui quando você pede e acolhe feedback.',
+  },
+  {
+    name: 'Desconhecido',
+    index: 3,
+    color: 'var(--purple-dark)',
+    soft: 'var(--purple-soft)',
+    self: false,
+    others: false,
+    text: 'Talentos e comportamentos que ninguém percebeu ainda. Costumam aparecer com novas experiências e desafios.',
+  },
+];
+
+const steps = [
+  ['1', 'var(--teal)', 'Escolha de palavras', 'Você seleciona os adjetivos que melhor descrevem como se vê.'],
+  ['2', 'var(--blue)', 'Feedback dos colegas', 'Pessoas próximas escolhem, da mesma lista, o que percebem em você.'],
+  ['3', 'var(--amber)', 'Construção da janela', 'As respostas se cruzam e cada adjetivo cai em um dos quatro quadrantes.'],
+  ['4', 'var(--purple)', 'Reflexão e diálogo', 'Compare percepções e converse sobre surpresas e pontos em comum.'],
+  ['5', 'var(--ink)', 'Plano de ação', 'Defina o que ampliar, revelar ou desenvolver — com apoio de um prompt de IA.'],
+];
+
+const reasons = [
+  ['Empatia', 'Entender como você chega até os outros aproxima as relações.'],
+  ['Comunicação mais clara', 'Percepções ditas em voz alta evitam ruídos e suposições.'],
+  ['Confiança na equipe', 'Revela percepções não ditas e fortalece a segurança psicológica.'],
+  ['Coaching e liderança', 'Um ponto de partida concreto para planos de desenvolvimento.'],
+];
+
+const faq = [
+  [
+    'O que é a Janela de Johari?',
+    'É um modelo de autoconhecimento criado em 1955 pelos psicólogos Joseph Luft e Harrington Ingham. Ele cruza o que você sabe sobre si com o que os outros percebem em você e organiza essas percepções em quatro quadrantes: Aberto, Cego, Oculto e Desconhecido.',
+  ],
+  [
+    'Preciso criar uma conta?',
+    'Não. Ao criar sua sessão você recebe um código de acesso para voltar à sua janela, e seus colegas respondem por um link — sem cadastro e sem senha.',
+  ],
+  [
+    'Quantos adjetivos devo escolher?',
+    'Entre 5 e 10, tanto na autoavaliação quanto no feedback dos colegas. Escolher poucos, com foco, deixa a leitura da janela mais clara.',
+  ],
+  [
+    'Quanto custa?',
+    'Nada. A ferramenta é gratuita para uso individual, com times ou em processos de coaching.',
+  ],
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Janela de Johari',
+      url: site,
+      description,
+      applicationCategory: 'LifestyleApplication',
+      operatingSystem: 'Web',
+      inLanguage: 'pt-BR',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'BRL' },
+      author: {
+        '@type': 'Person',
+        '@id': 'https://www.marcosmhs.com.br/#pessoa',
+        name: 'Marcos H. Silva',
+        url: 'https://www.marcosmhs.com.br/',
+      },
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: faq.map(([q, a]) => ({
+        '@type': 'Question',
+        name: q,
+        acceptedAnswer: { '@type': 'Answer', text: a },
+      })),
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={site} />
+    <meta name="theme-color" content="#FAF8F4" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/icons/Icon-192.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content="Janela de Johari" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={site} />
+    <meta property="og:image" content={`${site}icons/Icon-512.png`} />
+    <meta name="twitter:card" content="summary" />
+
+    <!-- Links de feedback antigos apontavam para a raiz: repassa ao app. -->
+    <script is:inline>
+      if (/[?&]session_feedback_code=/.test(location.search)) location.replace('/app/' + location.search);
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=Figtree:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="#topo">
+          <svg width="34" height="34" viewBox="0 0 36 36" aria-hidden="true">
+            {cellPos.map(([x, y], i) => <rect x={x} y={y} width="17" height="17" rx="4" fill={quadrantColors[i]} />)}
+          </svg>
+          Janela de Johari
+        </a>
+        <nav class="nav" aria-label="Principal">
+          <a class="nav-link" href="#o-que-e">O que é</a>
+          <a class="nav-link" href="#como-funciona">Como funciona</a>
+          <a class="nav-link" href="#comecar">Dar feedback</a>
+          <a class="btn btn-dark" href="/app/?criar=1">Criar sessão</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="topo" class="wrap hero">
+        <div class="hero-text">
+          <p class="eyebrow">Autoconhecimento · Feedback · Equipes</p>
+          <h1>Como você se vê. Como os outros veem você.</h1>
+          <p class="hero-lead">
+            A Janela de Johari cruza a sua autopercepção com o olhar de quem convive com você. Descubra pontos em comum,
+            surpresas e caminhos para crescer — com leveza e segurança.
+          </p>
+          <div class="actions">
+            <a class="btn btn-amber" href="/app/?criar=1">
+              Criar minha sessão
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+            </a>
+            <a class="btn btn-outline" href="#comecar">Tenho um código</a>
+          </div>
+          <p class="reassure">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1F7A72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+            Sem cadastro: você acessa com um código, seus colegas com um link.
+          </p>
+          <p class="resume" id="resume">
+            Você já tem uma sessão neste navegador.
+            <a href="/app/">Abrir minha janela →</a>
+          </p>
+        </div>
+
+        <figure class="matrix" aria-label="Exemplo dos quatro quadrantes da Janela de Johari">
+          <div class="matrix-grid">
+            <div></div>
+            <div class="axis">Eu sei</div>
+            <div class="axis">Eu não sei</div>
+
+            <div class="axis axis-row">Os outros sabem</div>
+            <div class="q q-open">
+              <div class="q-title">Aberto</div>
+              <div class="q-desc">O que você e os outros enxergam.</div>
+              <div class="tags"><span class="tag">Organizado</span><span class="tag">Honesto</span></div>
+            </div>
+            <div class="q q-blind">
+              <div class="q-title">Cego</div>
+              <div class="q-desc">O que os outros percebem e você ainda não.</div>
+              <div class="tags"><span class="tag">Empático</span><span class="tag">Resiliente</span></div>
+            </div>
+
+            <div class="axis axis-row">Os outros não sabem</div>
+            <div class="q q-hidden">
+              <div class="q-title">Oculto</div>
+              <div class="q-desc">O que você sabe e ainda não mostrou.</div>
+              <div class="tags"><span class="tag">Criativo</span><span class="tag">Proativo</span></div>
+            </div>
+            <div class="q q-unknown">
+              <div class="q-title">Desconhecido</div>
+              <div class="q-desc">O que ninguém percebeu — ainda.</div>
+              <div class="tags"><span class="tag tag-dashed">a descobrir</span></div>
+            </div>
+          </div>
+        </figure>
+      </section>
+
+      <section id="comecar" class="wrap start" aria-label="Como começar">
+        <div class="start-card start-create">
+          <div class="icon-badge" style="background: var(--amber)">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+          </div>
+          <h2>Criar sua sessão</h2>
+          <p>
+            Você escolhe os adjetivos que te definem e recebe um link para enviar a colegas, líderes ou amigos. Os
+            resultados chegam na sua janela.
+          </p>
+          <ol class="steps-mini">
+            <li>1 · Seu nome</li>
+            <li>2 · Autoavaliação</li>
+            <li>3 · Compartilhe o link</li>
+          </ol>
+          <a class="btn btn-amber" href="/app/?criar=1">
+            Criar minha sessão
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+          </a>
+        </div>
+
+        <div class="start-card start-code">
+          <div class="icon-badge" style="background: var(--teal)">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"></path></svg>
+          </div>
+          <h2>Dar feedback ou rever sua janela</h2>
+          <p>Recebeu um link? É só abri-lo. Tem um código de acesso? Digite abaixo para ver seus resultados.</p>
+          <form class="code-form" id="code-form" novalidate>
+            <label for="codigo">Código de acesso</label>
+            <div class="code-row">
+              <input
+                id="codigo"
+                name="codigo"
+                type="text"
+                placeholder="Ex.: K7Q4-29XM"
+                autocomplete="off"
+                autocapitalize="characters"
+                spellcheck="false"
+                required
+                aria-describedby="code-error"
+              />
+              <button class="btn btn-teal" type="submit">Entrar</button>
+            </div>
+            <p class="code-error" id="code-error" role="alert"></p>
+          </form>
+        </div>
+      </section>
+
+      <section id="o-que-e" class="band">
+        <div class="wrap">
+          <div class="split">
+            <div class="text">
+              <p class="eyebrow">O que é</p>
+              <h2 class="section-title">Um modelo simples para enxergar o que não se vê sozinho</h2>
+              <p class="muted">
+                Criada em 1955 pelos psicólogos Joseph Luft e Harrington Ingham — o nome junta Joe e Harry —, a Janela de
+                Johari organiza o que se sabe sobre uma pessoa em quatro áreas, cruzando dois olhares: o seu e o dos outros.
+              </p>
+              <p class="muted">
+                É usada em coaching, desenvolvimento de lideranças e times porque transforma percepções soltas em conversa:
+                quanto maior a área Aberta, mais fáceis ficam a comunicação e a confiança.
+              </p>
+            </div>
+
+            <div class="podcast">
+              <div class="podcast-label">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"></path></svg>
+                Podcast
+              </div>
+              <h3>Ouça: a Janela de Johari explicada</h3>
+              <p>O conceito, como funciona e os benefícios de aplicar no seu time.</p>
+              <audio id="podcast-audio" preload="none" src="/audio/podcast.mp3"></audio>
+              <div class="player">
+                <button class="play" id="podcast-play" type="button" aria-label="Reproduzir episódio">
+                  <svg class="icon-play" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.9l10-6.5a1 1 0 0 0 0-1.7l-10-6.5A1 1 0 0 0 8 5.5z"></path></svg>
+                  <svg class="icon-pause" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg>
+                </button>
+                <div class="track">
+                  <input id="podcast-seek" type="range" min="0" max="100" step="0.1" value="0" aria-label="Posição do episódio" />
+                  <div class="times"><span id="podcast-elapsed">0:00</span><span id="podcast-duration">--:--</span></div>
+                </div>
+                <button class="speed" id="podcast-speed" type="button" aria-label="Velocidade de reprodução">1x</button>
+              </div>
+              <small>* criado utilizando inteligência artificial</small>
+            </div>
+          </div>
+
+          <div class="quadrants">
+            <h3>Os quatro quadrantes</h3>
+            <div class="q-cards">
+              {
+                quadrants.map((q) => (
+                  <article class="q-card">
+                    <svg width="44" height="44" viewBox="0 0 36 36" aria-hidden="true">
+                      {cellPos.map(([x, y], i) => (
+                        <rect x={x} y={y} width="17" height="17" rx="4" fill={i === q.index ? quadrantColors[i] : muted} />
+                      ))}
+                    </svg>
+                    <h4 style={`color: ${q.color}`}>{q.name}</h4>
+                    <div class="pills">
+                      <span class="pill" style={q.self ? `background: ${q.soft}; color: ${q.color}` : ''}>
+                        {q.self ? 'Você sabe' : 'Você não'}
+                      </span>
+                      <span class="pill" style={q.others ? `background: ${q.soft}; color: ${q.color}` : ''}>
+                        {q.others ? 'Outros sabem' : 'Outros não'}
+                      </span>
+                    </div>
+                    <p>{q.text}</p>
+                  </article>
+                ))
+              }
+            </div>
+          </div>
+
+          <div class="grow">
+            <div class="text">
+              <h3>Ampliando a autoconsciência</h3>
+              <p class="muted">
+                O objetivo não é “acertar”, e sim fazer a área Aberta crescer. Ela avança por dois caminhos: ouvir o que os
+                outros percebem e compartilhar o que você guarda.
+              </p>
+              <ul class="legend">
+                <li><span class="swatch" style="background: var(--blue)"></span>Pedir feedback → o Cego diminui</li>
+                <li><span class="swatch" style="background: var(--amber)"></span>Compartilhar → o Oculto diminui</li>
+              </ul>
+            </div>
+            <div
+              class="before-after"
+              role="img"
+              aria-label="Antes: quatro quadrantes iguais. Depois: o quadrante Aberto ocupa a maior parte da janela."
+            >
+              <div class="mini-window">
+                <div class="mini-grid" style="grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr">
+                  {quadrantColors.map((c) => <span style={`background: ${c}`}></span>)}
+                </div>
+                Antes
+              </div>
+              <svg width="40" height="24" viewBox="0 0 40 24" fill="none" stroke="#1C2733" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h34M28 4l8 8-8 8"></path></svg>
+              <div class="mini-window">
+                <div class="mini-grid" style="grid-template-columns: 3fr 1fr; grid-template-rows: 3fr 1fr">
+                  {quadrantColors.map((c) => <span style={`background: ${c}`}></span>)}
+                </div>
+                Depois
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="como-funciona" class="wrap how">
+        <div class="head">
+          <p class="eyebrow">Como funciona</p>
+          <h2 class="section-title">Cinco passos, do primeiro adjetivo ao plano de ação</h2>
+        </div>
+        <ol class="steps">
+          {
+            steps.map(([n, color, name, text]) => (
+              <li>
+                <span class="step-n" style={`color: ${color}`}>{n}</span>
+                <strong>{name}</strong>
+                <span>{text}</span>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      <section class="why" aria-labelledby="por-que">
+        <div class="wrap">
+          <div class="head">
+            <p class="eyebrow">Por que usar</p>
+            <h2 id="por-que">Para pessoas, líderes e times que querem conversar melhor</h2>
+          </div>
+          <div class="why-grid">
+            {
+              reasons.map(([name, text]) => (
+                <div>
+                  <strong>{name}</strong>
+                  <span>{text}</span>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="wrap faq" aria-labelledby="faq-title">
+        <div>
+          <p class="eyebrow">Perguntas frequentes</p>
+          <h2 id="faq-title" class="section-title">Antes de começar</h2>
+        </div>
+        <div class="faq-list">
+          {
+            faq.map(([q, a]) => (
+              <details>
+                <summary>{q}</summary>
+                <p>{a}</p>
+              </details>
+            ))
+          }
+        </div>
+      </section>
+
+      <section id="contato" class="wrap contact">
+        <div class="text">
+          <h2>Vamos conversar?</h2>
+          <p class="muted">Dúvidas, ideias ou quer usar a dinâmica com o seu time? Escreva para mim.</p>
+        </div>
+        <a class="mail" href="mailto:marcosmhs@live.com">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F7A72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg>
+          marcosmhs@live.com
+        </a>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <span>Desenvolvido por <a class="author-link" href="https://www.marcosmhs.com.br/" rel="author">Marcos H. Silva</a> · {year}</span>
+        <div class="social">
+          <a href="https://www.linkedin.com/in/marcosmhs/" aria-label="LinkedIn" rel="noopener" target="_blank">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"></rect><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"></path></svg>
+          </a>
+          <a href="https://github.com/marcosmhs/" aria-label="GitHub" rel="noopener" target="_blank">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-4 1.5-4-2-6-2.5M15 21v-3.5a3 3 0 0 0-.8-2.3c2.8-.3 5.8-1.4 5.8-6.2a4.8 4.8 0 0 0-1.3-3.3 4.5 4.5 0 0 0-.1-3.3s-1.1-.3-3.4 1.3a11.6 11.6 0 0 0-6.2 0C6.7 2.1 5.6 2.4 5.6 2.4a4.5 4.5 0 0 0-.1 3.3A4.8 4.8 0 0 0 4.2 9c0 4.8 3 5.9 5.8 6.2a3 3 0 0 0-.8 2.3V21"></path></svg>
+          </a>
+          <a href="https://www.marcosmhs.com.br/" aria-label="Site pessoal" rel="noopener" target="_blank">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg>
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Chave usada pelo app (lib/web_handoff.dart) para receber o código.
+      const ACCESS_CODE_KEY = 'johari.accessCode';
+
+      // Sessão salva pelo app (shared_preferences guarda em localStorage).
+      try {
+        if (localStorage.getItem('flutter.session')) document.getElementById('resume')?.classList.add('is-visible');
+      } catch {
+        /* armazenamento bloqueado: segue sem o atalho */
+      }
+
+      // Código de acesso: vai para o app pelo sessionStorage, nunca pela URL.
+      const form = document.getElementById('code-form') as HTMLFormElement;
+      const input = document.getElementById('codigo') as HTMLInputElement;
+      const error = document.getElementById('code-error') as HTMLElement;
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const code = input.value.trim();
+        if (!code) {
+          error.textContent = 'Informe o código de acesso da sua sessão.';
+          input.focus();
+          return;
+        }
+        try {
+          sessionStorage.setItem(ACCESS_CODE_KEY, code);
+        } catch {
+          error.textContent = 'Seu navegador bloqueou o armazenamento local. Libere-o para entrar com o código.';
+          return;
+        }
+        location.assign('/app/');
+      });
+      input.addEventListener('input', () => (error.textContent = ''));
+
+      // Podcast.
+      const audio = document.getElementById('podcast-audio') as HTMLAudioElement;
+      const play = document.getElementById('podcast-play') as HTMLButtonElement;
+      const seek = document.getElementById('podcast-seek') as HTMLInputElement;
+      const elapsed = document.getElementById('podcast-elapsed') as HTMLElement;
+      const duration = document.getElementById('podcast-duration') as HTMLElement;
+      const speed = document.getElementById('podcast-speed') as HTMLButtonElement;
+
+      const fmt = (s: number) => {
+        if (!Number.isFinite(s)) return '--:--';
+        const m = Math.floor(s / 60);
+        return `${m}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+      };
+      const setPlaying = (playing: boolean) => {
+        play.classList.toggle('is-playing', playing);
+        play.setAttribute('aria-label', playing ? 'Pausar episódio' : 'Reproduzir episódio');
+      };
+
+      play.addEventListener('click', () => (audio.paused ? audio.play() : audio.pause()));
+      audio.addEventListener('play', () => setPlaying(true));
+      audio.addEventListener('pause', () => setPlaying(false));
+      audio.addEventListener('ended', () => {
+        audio.currentTime = 0;
+        setPlaying(false);
+      });
+      audio.addEventListener('loadedmetadata', () => (duration.textContent = fmt(audio.duration)));
+      audio.addEventListener('timeupdate', () => {
+        elapsed.textContent = fmt(audio.currentTime);
+        if (audio.duration) seek.value = String((audio.currentTime / audio.duration) * 100);
+      });
+      seek.addEventListener('input', () => {
+        if (audio.duration) audio.currentTime = (Number(seek.value) / 100) * audio.duration;
+      });
+
+      const speeds = [1, 1.5, 2];
+      speed.addEventListener('click', () => {
+        const next = speeds[(speeds.indexOf(audio.playbackRate) + 1) % speeds.length];
+        audio.playbackRate = next;
+        speed.textContent = `${next}x`;
+      });
+    </script>
+  </body>
+</html>
